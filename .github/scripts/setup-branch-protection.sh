@@ -7,7 +7,7 @@ set -euo pipefail
 
 REPO="${1:-${GITHUB_REPOSITORY:-denilsonluiz3-sys/MULTI_Bet_playing_Demo}}"
 RULESET_NAME="MULTI_Bet main — Merge Queue"
-API_VERSION="2026-03-10"
+API_VERSION="2022-11-28"
 
 command -v gh >/dev/null || { echo "gh CLI is required" >&2; exit 1; }
 gh auth status >/dev/null
@@ -15,8 +15,8 @@ gh auth status >/dev/null
 OWNER="${REPO%%/*}"
 NAME="${REPO#*/}"
 
-# Only the fast CI check is required by the queue. Android packaging stays outside
-# the merge gate and continues through build-android.yml.
+# Keep the merge gate minimal: only the fast CI context is required.
+# Android packaging remains outside the merge gate.
 RULESET_JSON=$(cat <<'JSON'
 {
   "name": "MULTI_Bet main — Merge Queue",
@@ -62,8 +62,7 @@ RULESET_JSON=$(cat <<'JSON'
         "min_entries_to_merge": 1,
         "min_entries_to_merge_wait_minutes": 1
       }
-    },
-    { "type": "non_fast_forward" }
+    }
   ]
 }
 JSON
@@ -78,12 +77,24 @@ EXISTING_ID=$(gh api --paginate \
 request_ruleset() {
   local method="$1"
   local endpoint="$2"
-  printf '%s\n' "${RULESET_JSON}" | gh api \
-    --method "${method}" \
-    -H "Accept: application/vnd.github+json" \
-    -H "X-GitHub-Api-Version: ${API_VERSION}" \
-    "${endpoint}" \
-    --input - >/dev/null
+  local response_file
+  response_file="$(mktemp)"
+  trap 'rm -f "${response_file}"' RETURN
+
+  if printf '%s\n' "${RULESET_JSON}" | gh api \
+      --method "${method}" \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: ${API_VERSION}" \
+      "${endpoint}" \
+      --input - >"${response_file}"; then
+    cat "${response_file}" >/dev/null
+    return 0
+  fi
+
+  echo "GitHub rejected the ruleset request." >&2
+  echo "HTTP/API response:" >&2
+  cat "${response_file}" >&2 || true
+  return 1
 }
 
 if [[ -n "${EXISTING_ID}" ]]; then
@@ -94,5 +105,15 @@ else
   echo "Created merge-queue ruleset."
 fi
 
+# Auto-merge must be enabled at repository level for PRs to enter the automated path.
+gh api \
+  --method PATCH \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: ${API_VERSION}" \
+  "/repos/${OWNER}/${NAME}" \
+  -f allow_auto_merge=true \
+  >/dev/null
+
 echo "Main is configured to require the fast CI check and use the merge queue."
+echo "Repository auto-merge is enabled."
 echo "Android build remains non-blocking and runs through build-android.yml."
