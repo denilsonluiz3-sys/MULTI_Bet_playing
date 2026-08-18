@@ -1,3 +1,5 @@
+using MULTI_Bet_playing_Demo.Services;
+
 namespace MULTI_Bet_playing_Demo;
 
 public partial class AppShell : Shell
@@ -5,6 +7,38 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
-        Routing.RegisterRoute(nameof(Pages.WebViewPage), typeof(Pages.WebViewPage));
+        AppLog.Info("AppShell criado");
+    }
+
+    private async void OnFilterAll(object? sender, EventArgs e)
+    {
+        FilterState.Current = FilterState.All;
+        await GoHomeAsync();
+    }
+
+    private async void OnFilterFavorites(object? sender, EventArgs e)
+    {
+        FilterState.Current = FilterState.Favorites;
+        await GoHomeAsync();
+    }
+
+    private async void OnFilterRecents(object? sender, EventArgs e)
+    {
+        FilterState.Current = FilterState.Recents;
+        await GoHomeAsync();
+    }
+
+    private async Task GoHomeAsync()
+    {
+        try
+        {
+            FlyoutIsPresented = false;
+            await GoToAsync("//tabs/home");
+        }
+        catch (Exception ex)
+        {
+            AppLog.Exception("AppShell.GoHomeAsync", ex);
+            try { await GoToAsync("//home"); } catch { }
+        }
     }
 }
