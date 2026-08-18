@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="MULTI_Bet_playing_Demo.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:MULTI_Bet_playing_Demo.Pages"
+    Shell.FlyoutBehavior="Flyout"
+    Title="MULTI Bet"
+    FlyoutBackgroundColor="{DynamicResource Surface}">
+
+    <TabBar>
+        <ShellContent
+            Title="Início"
+            ContentTemplate="{DataTemplate pages:HomePage}"
+            Route="home" />
+
+        <ShellContent
+            Title="Demo"
+            ContentTemplate="{DataTemplate pages:DemoPage}"
+            Route="demo" />
+
+        <ShellContent
+            Title="Play"
+            ContentTemplate="{DataTemplate pages:PlayPage}"
+            Route="play" />
+    </TabBar>
+
+    <FlyoutItem Title="Configurações">
+        <ShellContent
+            Title="Temas"
+            ContentTemplate="{DataTemplate pages:SettingsPage}"
+            Route="settings" />
+    </FlyoutItem>
+
+</Shell>
