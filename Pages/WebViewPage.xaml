@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MULTI_Bet_playing_Demo.Pages.WebViewPage"
+             BackgroundColor="{DynamicResource Background}">
+
+    <Grid RowDefinitions="Auto,*">
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              BackgroundColor="{DynamicResource Surface}"
+              Padding="8,4">
+            <Label x:Name="TitleLabel"
+                   Text="Cassino"
+                   FontAttributes="Bold"
+                   TextColor="{DynamicResource TextPrimary}"
+                   VerticalOptions="Center"
+                   LineBreakMode="TailTruncation" />
+            <Button Text="↻"
+                    Clicked="OnReload"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource TextPrimary}"
+                    FontSize="18"
+                    WidthRequest="40"
+                    HeightRequest="36"
+                    Padding="0"
+                    Grid.Column="1" />
+            <Button Text="✕"
+                    Clicked="OnClose"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Accent}"
+                    FontSize="18"
+                    WidthRequest="40"
+                    HeightRequest="36"
+                    Padding="0"
+                    Grid.Column="2" />
+        </Grid>
+        <WebView x:Name="MainWebView" Grid.Row="1" />
+    </Grid>
+</ContentPage>

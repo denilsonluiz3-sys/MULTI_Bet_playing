@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MULTI_Bet_playing_Demo.Pages.SettingsPage"
+             Title="Configurações"
+             BackgroundColor="{DynamicResource Background}">
+
+    <VerticalStackLayout Padding="20" Spacing="16">
+
+        <Label Text="Tema do App"
+               FontSize="18"
+               FontAttributes="Bold"
+               TextColor="{DynamicResource TextPrimary}" />
+
+        <RadioButton x:Name="DarkRadio"
+                     Content="🌙 Dark"
+                     GroupName="Theme"
+                     TextColor="{DynamicResource TextPrimary}"
+                     CheckedChanged="OnThemeChanged" />
+
+        <RadioButton x:Name="LightRadio"
+                     Content="☀️ Light"
+                     GroupName="Theme"
+                     TextColor="{DynamicResource TextPrimary}"
+                     CheckedChanged="OnThemeChanged" />
+
+        <RadioButton x:Name="CasinoRadio"
+                     Content="🎰 Casino (Dourado/Roxo)"
+                     GroupName="Theme"
+                     TextColor="{DynamicResource TextPrimary}"
+                     CheckedChanged="OnThemeChanged" />
+
+        <BoxView HeightRequest="1" Color="{DynamicResource Border}" Margin="0,12" />
+
+        <Label Text="MULTI Bet Playing Demo"
+               FontSize="12"
+               TextColor="{DynamicResource TextSecondary}"
+               HorizontalOptions="Center" />
+        <Label Text="v1.0.0 – App independente"
+               FontSize="11"
+               TextColor="{DynamicResource TextSecondary}"
+               HorizontalOptions="Center" />
+
+    </VerticalStackLayout>
+</ContentPage>
