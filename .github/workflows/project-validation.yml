@@ -55,9 +55,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
           cache: true
-          cache-dependency-path: |
-            MULTI_Bet_playing_Demo.csproj
-            tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
+          cache-dependency-path: tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
       - name: Restore tests
         run: dotnet restore tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
       - name: Run tests
@@ -78,9 +76,9 @@ jobs:
             src/MULTI_Bet.Infrastructure/MULTI_Bet.Infrastructure.csproj
             src/MULTI_Bet.Api/MULTI_Bet.Api.csproj
       - name: Restore backend
-        run: dotnet restore MULTI_Bet.sln
-      - name: Build backend solution
-        run: dotnet build MULTI_Bet.sln --configuration Release --no-restore
+        run: dotnet restore src/MULTI_Bet.Api/MULTI_Bet.Api.csproj
+      - name: Build backend
+        run: dotnet build src/MULTI_Bet.Api/MULTI_Bet.Api.csproj --configuration Release --no-restore
 
   android:
     name: android-build
