@@ -16,7 +16,10 @@ public sealed record TrustCheck(
     string Name,
     bool Passed,
     string Detail,
-    string? Source = null);
+    string? Source = null)
+{
+    public string Icon => Passed ? "✓" : "⚠";
+}
 
 public sealed class TrustReport
 {
