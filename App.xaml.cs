@@ -1,3 +1,4 @@
+using MULTI_Bet_playing_Demo.Pages;
 using MULTI_Bet_playing_Demo.Services;
 
 namespace MULTI_Bet_playing_Demo;
@@ -8,6 +9,9 @@ public partial class App : Application
     {
         InitializeComponent();
         ThemeManager.ApplySavedTheme();
-        MainPage = new AppShell();
+
+        MainPage = ComplianceService.HasAccepted
+            ? new AppShell()
+            : new CompliancePage();
     }
 }

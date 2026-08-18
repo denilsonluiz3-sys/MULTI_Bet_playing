@@ -17,6 +17,8 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        WebViewSecurity.ConfigureHandlers();
+
         builder.Services.AddSingleton<CardService>();
 
         builder.Services.AddTransient<HomePage>();
@@ -24,6 +26,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PlayPage>();
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<WebViewPage>();
+        builder.Services.AddTransient<CompliancePage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
