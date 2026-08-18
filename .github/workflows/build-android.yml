@@ -1,63 +1,61 @@
 name: Build Android APK
 
 on:
-  workflow_run:
-    workflows: ["Project Validation"]
-    types: [completed]
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*'
 
 permissions:
   contents: read
 
 concurrency:
-  group: build-android-${{ github.event.workflow_run.head_branch || github.ref }}
+  group: android-release-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'main')
+    name: build-release-apk
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
-      - name: Checkout validated commit
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: MULTI_Bet_playing_Demo.csproj
 
       - name: Install MAUI Android workload
-        run: |
-          dotnet workload install maui-android
-          dotnet workload list
+        run: dotnet workload install maui-android --skip-manifest-update
 
       - name: Restore
         run: dotnet restore MULTI_Bet_playing_Demo.csproj
 
-      - name: Publish APK (Release)
+      - name: Publish APK
         run: |
           dotnet publish MULTI_Bet_playing_Demo.csproj \
-            -c Release \
-            -f net10.0-android \
+            --configuration Release \
+            --framework net10.0-android \
+            --no-restore \
             -p:AndroidPackageFormats=apk
 
-      - name: Upload APK artifacts
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: multibet-apk
+          name: multibet-apk-${{ github.sha }}
           path: '**/bin/Release/**/*.apk'
           if-no-files-found: error
+          retention-days: 14
 
-      - name: Upload ProGuard mapping (if present)
+      - name: Upload ProGuard mapping
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: multibet-mapping
+          name: multibet-mapping-${{ github.sha }}
           path: '**/mapping.txt'
           if-no-files-found: ignore
+          retention-days: 14
