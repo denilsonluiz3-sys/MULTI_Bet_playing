@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MULTI_Bet_playing_Demo.Pages.SecurityPage"
+             Title="Verificar"
+             BackgroundColor="{DynamicResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Label Text="🛡️ Verificador MULTI_Bet" FontSize="24" FontAttributes="Bold"
+                   TextColor="{DynamicResource TextPrimary}" />
+            <Label Text="Pesquise uma marca, empresa, CNPJ ou URL. A consulta usa fontes públicas e é feita somente quando você solicitar."
+                   FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+
+            <Entry x:Name="QueryEntry" Placeholder="Nome, CNPJ ou https://dominio..."
+                   Keyboard="Url" ClearButtonVisibility="WhileEditing" />
+            <Button Text="🔎 Verificar agora" Clicked="OnVerifyClicked" />
+
+            <Border x:Name="ResultCard" IsVisible="False" Padding="14"
+                    Stroke="{DynamicResource Border}" StrokeThickness="1"
+                    BackgroundColor="{DynamicResource CardBackground}"
+                    StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="8">
+                    <Label x:Name="StatusLabel" FontSize="20" FontAttributes="Bold" />
+                    <Label x:Name="SummaryLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
+                    <Label x:Name="IdentityLabel" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                    <Button x:Name="AddButton" Text="＋ Adicionar à Central" IsVisible="False"
+                            Clicked="OnAddToCentralClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Verificações" FontSize="17" FontAttributes="Bold"
+                   TextColor="{DynamicResource TextPrimary}" />
+            <CollectionView x:Name="ChecksCollection" SelectionMode="None" HeightRequest="260">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto,*" Padding="4" ColumnSpacing="8">
+                            <Label Text="{Binding Passed, Converter={StaticResource BoolToIconConverter}}" FontSize="18" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                <Label Text="{Binding Detail}" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label x:Name="SourceLabel" FontSize="11" TextColor="{DynamicResource TextSecondary}" />
+            <Label Text="A ausência de correspondência não é, sozinha, prova de fraude. O relatório é informativo e deve ser conferido na fonte oficial."
+                   FontSize="11" TextColor="{DynamicResource TextSecondary}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
