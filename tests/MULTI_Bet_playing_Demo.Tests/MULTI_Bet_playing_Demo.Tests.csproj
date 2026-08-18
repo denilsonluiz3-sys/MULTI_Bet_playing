@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../../Models/CardItem.cs" Link="Models/CardItem.cs" />
+    <Compile Include="../../Services/CardService.cs" Link="Services/CardService.cs" />
     <Compile Include="../../Services/UrlValidator.cs" Link="Services/UrlValidator.cs" />
+    <Compile Include="../../Services/WebViewSecurity.cs" Link="Services/WebViewSecurity.cs" />
   </ItemGroup>
 </Project>
