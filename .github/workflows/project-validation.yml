@@ -26,13 +26,29 @@ jobs:
         run: |
           set -euo pipefail
           test -f README.md
-          test -f MULTI_Bet_playing_Demo.csproj
           test -f MauiProgram.cs
           test -d Pages
           test -d Services
           test -d Models
           test -d Platforms/Android
-          test -f tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
+          find . -maxdepth 3 -type f -name '*.csproj' -not -path './tests/*' -print -quit | grep -q .
+          find tests -type f -name '*.csproj' -print -quit | grep -q .
+
+      - name: Locate application and test projects
+        id: projects
+        shell: bash
+        run: |
+          set -euo pipefail
+          app_project="$(find . -maxdepth 3 -type f -name '*.csproj' -not -path './tests/*' -print -quit)"
+          test_projects="$(find tests -type f -name '*.csproj' -print)"
+          test -n "$app_project"
+          test -n "$test_projects"
+          echo "app_project=${app_project#./}" >> "$GITHUB_OUTPUT"
+          {
+            echo 'test_projects<<EOF'
+            printf '%s\n' "$test_projects"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -43,16 +59,26 @@ jobs:
         run: dotnet workload install maui-android
 
       - name: Restore application
-        run: dotnet restore MULTI_Bet_playing_Demo.csproj
+        run: dotnet restore "${{ steps.projects.outputs.app_project }}"
 
       - name: Build Android Debug
-        run: dotnet build MULTI_Bet_playing_Demo.csproj --configuration Debug --framework net10.0-android --no-restore
+        run: dotnet build "${{ steps.projects.outputs.app_project }}" --configuration Debug --framework net10.0-android --no-restore
 
       - name: Restore tests
-        run: dotnet restore tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r project; do
+            dotnet restore "$project"
+          done <<< '${{ steps.projects.outputs.test_projects }}'
 
       - name: Run unit tests
-        run: dotnet test tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj --configuration Release --no-restore --verbosity normal
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r project; do
+            dotnet test "$project" --configuration Release --no-restore --verbosity normal
+          done <<< '${{ steps.projects.outputs.test_projects }}'
 
   security-validation:
     name: security-validation
