@@ -7,17 +7,33 @@
 
     <Grid RowDefinitions="Auto,*" Padding="4" RowSpacing="4">
 
-        <ScrollView Orientation="Horizontal" HeightRequest="44">
-            <HorizontalStackLayout Spacing="8" Padding="4,0">
-                <Button Text="Carregar Favoritos" Clicked="OnLoadFavorites"
+        <ScrollView Orientation="Horizontal" HeightRequest="48">
+            <HorizontalStackLayout Spacing="6" Padding="4,0">
+                <Button Text="Favoritos" Clicked="OnLoadFavorites"
                         BackgroundColor="{DynamicResource Primary}" TextColor="White"
-                        FontSize="12" HeightRequest="36" Padding="12,0" />
-                <Button x:Name="ToggleFullBtn" Text="Tela cheia" Clicked="OnToggleFullScreen"
+                        FontSize="11" HeightRequest="36" Padding="10,0" />
+                <Button Text="Escolher" Clicked="OnPickSlots"
+                        BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                        BorderColor="{DynamicResource Border}" BorderWidth="1"
+                        FontSize="11" HeightRequest="36" Padding="10,0" />
+                <Button Text="⇄ Trocar" Clicked="OnSwap"
+                        BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                        BorderColor="{DynamicResource Border}" BorderWidth="1"
+                        FontSize="11" HeightRequest="36" Padding="10,0" />
+                <Button x:Name="MuteAllBtn" Text="🔇 Mute" Clicked="OnMuteAll"
                         BackgroundColor="{DynamicResource Secondary}" TextColor="Black"
-                        FontSize="12" HeightRequest="36" Padding="12,0" />
+                        FontSize="11" HeightRequest="36" Padding="10,0" />
+                <Button x:Name="FullMenuBtn" Text="⛶ Tela cheia" Clicked="OnFullMenu"
+                        BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                        BorderColor="{DynamicResource Border}" BorderWidth="1"
+                        FontSize="11" HeightRequest="36" Padding="10,0" />
+                <Button Text="↻ Recarregar" Clicked="OnReloadAll"
+                        BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                        BorderColor="{DynamicResource Border}" BorderWidth="1"
+                        FontSize="11" HeightRequest="36" Padding="10,0" />
                 <Button Text="Limpar" Clicked="OnClearAll"
                         BackgroundColor="{DynamicResource Accent}" TextColor="White"
-                        FontSize="12" HeightRequest="36" Padding="12,0" />
+                        FontSize="11" HeightRequest="36" Padding="10,0" />
             </HorizontalStackLayout>
         </ScrollView>
 
@@ -25,29 +41,51 @@
 
             <Border x:Name="BorderLeft" Grid.Column="0" Stroke="{DynamicResource Border}" StrokeThickness="1"
                     StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
-                <Grid RowDefinitions="Auto,*">
-                    <Grid ColumnDefinitions="*,Auto" Margin="6,2">
-                        <Label x:Name="LabelLeft" Text="Tela 1" FontSize="12"
-                               TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
-                        <Button Text="⛶" Clicked="OnExpandLeft" BackgroundColor="Transparent"
-                                TextColor="{DynamicResource TextPrimary}" FontSize="14"
-                                WidthRequest="36" HeightRequest="28" Padding="0" Grid.Column="1" />
-                    </Grid>
-                    <WebView x:Name="WebViewLeft" Grid.Row="1" />
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Label x:Name="LabelLeft" Text="Tela 1" FontSize="11"
+                           TextColor="{DynamicResource TextSecondary}" LineBreakMode="TailTruncation" Margin="6,4,6,0" />
+                    <ScrollView Grid.Row="1" Orientation="Horizontal" HeightRequest="36">
+                        <HorizontalStackLayout Spacing="4" Padding="4,0">
+                            <Button Text="⛶" Clicked="OnExpandLeft" FontSize="12" HeightRequest="30" WidthRequest="36" Padding="0"
+                                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+                            <Button x:Name="MuteLeftBtn" Text="🔇" Clicked="OnMuteLeft" FontSize="12" HeightRequest="30" WidthRequest="36" Padding="0"
+                                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+                            <Button Text="↻" Clicked="OnReloadLeft" FontSize="12" HeightRequest="30" WidthRequest="36" Padding="0"
+                                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+                            <Button Text="…" Clicked="OnMenuLeft" FontSize="12" HeightRequest="30" WidthRequest="36" Padding="0"
+                                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                    <WebView x:Name="WebViewLeft" Grid.Row="2" />
                 </Grid>
             </Border>
 
             <Border x:Name="BorderRight" Grid.Column="1" Stroke="{DynamicResource Border}" StrokeThickness="1"
                     StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
-                <Grid RowDefinitions="Auto,*">
-                    <Grid ColumnDefinitions="*,Auto" Margin="6,2">
-                        <Label x:Name="LabelRight" Text="Tela 2" FontSize="12"
-                               TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
-                        <Button Text="⛶" Clicked="OnExpandRight" BackgroundColor="Transparent"
-                                TextColor="{DynamicResource TextPrimary}" FontSize="14"
-                                WidthRequest="36" HeightRequest="28" Padding="0" Grid.Column="1" />
-                    </Grid>
-                    <WebView x:Name="WebViewRight" Grid.Row="1" />
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Label x:Name="LabelRight" Text="Tela 2" FontSize="11"
+                           TextColor="{DynamicResource TextSecondary}" LineBreakMode="TailTruncation" Margin="6,4,6,0" />
+                    <ScrollView Grid.Row="1" Orientation="Horizontal" HeightRequest="36">
+                        <HorizontalStackLayout Spacing="4" Padding="4,0">
+                            <Button Text="⛶" Clicked="OnExpandRight" FontSize="12" HeightRequest="30" WidthRequest="36" Padding="0"
+                                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+                            <Button x:Name="MuteRightBtn" Text="🔇" Clicked="OnMuteRight" FontSize="12" HeightRequest="30" WidthRequest="36" Padding="0"
+                                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+                            <Button Text="↻" Clicked="OnReloadRight" FontSize="12" HeightRequest="30" WidthRequest="36" Padding="0"
+                                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+                            <Button Text="…" Clicked="OnMenuRight" FontSize="12" HeightRequest="30" WidthRequest="36" Padding="0"
+                                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                    <WebView x:Name="WebViewRight" Grid.Row="2" />
                 </Grid>
             </Border>
         </Grid>
