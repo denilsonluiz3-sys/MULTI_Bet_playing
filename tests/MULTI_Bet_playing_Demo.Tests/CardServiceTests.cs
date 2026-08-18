@@ -16,6 +16,21 @@ public sealed class CardServiceTests : IDisposable
     }
 
     [Fact]
+    public void RejectsBlankStoragePath()
+    {
+        Assert.Throws<ArgumentException>(() => new CardService(" "));
+    }
+
+    [Fact]
+    public async Task RejectsNullCards()
+    {
+        var service = new CardService(_filePath);
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.AddCardAsync(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.UpdateCardAsync(null!));
+    }
+
+    [Fact]
     public async Task StartsEmptyWhenStorageDoesNotExist()
     {
         var service = new CardService(_filePath);
@@ -69,6 +84,19 @@ public sealed class CardServiceTests : IDisposable
         Assert.Equal("New", updated.Title);
 
         await service.RemoveCardAsync("1");
+        Assert.Empty(await service.GetCardsAsync());
+    }
+
+    [Fact]
+    public async Task MissingCardOperationsDoNotCreateCards()
+    {
+        var service = new CardService(_filePath);
+
+        await service.UpdateCardAsync(new CardItem { Id = "missing" });
+        await service.ToggleFavoriteAsync("missing");
+        await service.MarkUsedAsync("missing");
+        await service.RemoveCardAsync("missing");
+
         Assert.Empty(await service.GetCardsAsync());
     }
 

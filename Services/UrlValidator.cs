@@ -70,6 +70,9 @@ public static class UrlValidator
         if (!IPAddress.TryParse(uri.Host, out var address))
             return uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase);
 
+        if (address.IsIPv4MappedToIPv6)
+            address = address.MapToIPv4();
+
         if (IPAddress.IsLoopback(address) || address.Equals(IPAddress.Any) || address.Equals(IPAddress.IPv6Any))
             return true;
 
