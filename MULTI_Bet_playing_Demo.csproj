@@ -11,16 +11,39 @@
 
     <ApplicationTitle>MULTI Bet</ApplicationTitle>
     <ApplicationId>com.multibet.playing.demo</ApplicationId>
-    <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
-    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.1.1</ApplicationDisplayVersion>
+    <ApplicationVersion>2</ApplicationVersion>
 
     <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
     <AndroidPackageFormats>apk</AndroidPackageFormats>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <AndroidEnableProguard>true</AndroidEnableProguard>
+    <AndroidLinkTool>r8</AndroidLinkTool>
+    <AndroidCreateProguardMappingFile>true</AndroidCreateProguardMappingFile>
+    <AndroidProguardMappingFile>$(OutputPath)mapping.txt</AndroidProguardMappingFile>
+
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+
+    <RunAOTCompilation>false</RunAOTCompilation>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <AndroidEnableProguard>false</AndroidEnableProguard>
+    <PublishTrimmed>false</PublishTrimmed>
+    <AndroidLinkMode>None</AndroidLinkMode>
+  </PropertyGroup>
+
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFD700" />
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0D0D0D" BaseSize="128,128" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProguardConfiguration Include="Platforms\Android\proguard.cfg" />
   </ItemGroup>
 
   <ItemGroup>
