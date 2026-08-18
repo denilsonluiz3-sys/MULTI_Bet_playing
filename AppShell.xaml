@@ -14,16 +14,12 @@
 
     <TabBar Route="tabs">
         <ShellContent Title="Início" ContentTemplate="{DataTemplate pages:HomePage}" Route="home" />
-        <ShellContent Title="Demo" ContentTemplate="{DataTemplate pages:DemoPage}" Route="demo" />
         <ShellContent Title="Play" ContentTemplate="{DataTemplate pages:PlayPage}" Route="play" />
+        <ShellContent Title="Jogar Demo" ContentTemplate="{DataTemplate pages:DemoPage}" Route="demo" />
     </TabBar>
 
     <FlyoutItem Title="⚙️ Configurações" Route="settings_item">
         <ShellContent Title="Configurações" ContentTemplate="{DataTemplate pages:SettingsPage}" Route="settings" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="📜 Logs" Route="logs_item">
-        <ShellContent Title="Logs" ContentTemplate="{DataTemplate pages:LogsPage}" Route="logs" />
     </FlyoutItem>
 
 </Shell>

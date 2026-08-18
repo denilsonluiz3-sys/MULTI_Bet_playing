@@ -8,10 +8,6 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        AppLog.WireGlobalExceptionHandlers();
-        AppLog.Init();
-        AppLog.Info("MauiProgram.CreateMauiApp");
-
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -24,21 +20,17 @@ public static class MauiProgram
         WebViewSecurity.ConfigureHandlers();
 
         builder.Services.AddSingleton<CardService>();
-
         builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<DemoPage>();
         builder.Services.AddTransient<PlayPage>();
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<WebViewPage>();
         builder.Services.AddTransient<CompliancePage>();
-        builder.Services.AddTransient<LogsPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
 
-        var app = builder.Build();
-        AppLog.Info("MauiApp built");
-        return app;
+        return builder.Build();
     }
 }

@@ -1,7 +1,6 @@
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
-using MULTI_Bet_playing_Demo.Services;
 
 namespace MULTI_Bet_playing_Demo;
 
@@ -10,9 +9,4 @@ namespace MULTI_Bet_playing_Demo;
         ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
 public class MainActivity : MauiAppCompatActivity
 {
-    protected override void OnCreate(Bundle? savedInstanceState)
-    {
-        base.OnCreate(savedInstanceState);
-        AppLog.Info("MainActivity.OnCreate");
-    }
 }

@@ -7,7 +7,6 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
-        AppLog.Info("AppShell criado");
     }
 
     private async void OnFilterAll(object? sender, EventArgs e)
@@ -35,9 +34,8 @@ public partial class AppShell : Shell
             FlyoutIsPresented = false;
             await GoToAsync("//tabs/home");
         }
-        catch (Exception ex)
+        catch
         {
-            AppLog.Exception("AppShell.GoHomeAsync", ex);
             try { await GoToAsync("//home"); } catch { }
         }
     }
