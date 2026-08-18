@@ -14,10 +14,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  project-validation:
-    name: project-validation
+  fast-validation:
+    name: fast-validation
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -34,16 +34,33 @@ jobs:
           find . -maxdepth 3 -type f -name '*.csproj' -not -path './tests/*' -print -quit | grep -q .
           find tests -type f -name '*.csproj' -print -quit | grep -q .
 
-      - name: Locate application and test projects
-        id: projects
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore application
         shell: bash
         run: |
           set -euo pipefail
           app_project="$(find . -maxdepth 3 -type f -name '*.csproj' -not -path './tests/*' -print -quit)"
-          test_projects="$(find tests -type f -name '*.csproj' -print)"
           test -n "$app_project"
+          dotnet restore "${app_project#./}"
+
+  test-validation:
+    name: test-validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Locate test projects
+        id: projects
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_projects="$(find tests -type f -name '*.csproj' -print)"
           test -n "$test_projects"
-          echo "app_project=${app_project#./}" >> "$GITHUB_OUTPUT"
           {
             echo 'test_projects<<EOF'
             printf '%s\n' "$test_projects"
@@ -55,20 +72,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Install MAUI Android workload
-        run: dotnet workload install maui-android
-
-      - name: Restore application
-        run: dotnet restore "${{ steps.projects.outputs.app_project }}"
-
-      - name: Build Android Debug
-        run: dotnet build "${{ steps.projects.outputs.app_project }}" --configuration Debug --framework net10.0-android --no-restore
-
       - name: Restore tests
         shell: bash
         run: |
           set -euo pipefail
           while IFS= read -r project; do
+            test -z "$project" && continue
             dotnet restore "$project"
           done <<< '${{ steps.projects.outputs.test_projects }}'
 
@@ -77,8 +86,39 @@ jobs:
         run: |
           set -euo pipefail
           while IFS= read -r project; do
+            test -z "$project" && continue
             dotnet test "$project" --configuration Release --no-restore --verbosity normal
           done <<< '${{ steps.projects.outputs.test_projects }}'
+
+  android-validation:
+    name: android-validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Locate application project
+        id: project
+        shell: bash
+        run: |
+          set -euo pipefail
+          app_project="$(find . -maxdepth 3 -type f -name '*.csproj' -not -path './tests/*' -print -quit)"
+          test -n "$app_project"
+          echo "app_project=${app_project#./}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install MAUI Android workload
+        run: dotnet workload install maui-android
+
+      - name: Restore application
+        run: dotnet restore "${{ steps.project.outputs.app_project }}"
+
+      - name: Build Android Debug
+        run: dotnet build "${{ steps.project.outputs.app_project }}" --configuration Debug --framework net10.0-android --no-restore
 
   security-validation:
     name: security-validation
