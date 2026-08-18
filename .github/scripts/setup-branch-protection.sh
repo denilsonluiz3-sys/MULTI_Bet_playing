@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Configures main with supported repository rules without GitHub Merge Queue.
-# This repository is owned by a personal account, so this script intentionally
-# does NOT create or reference a merge_queue rule.
+# Configures only the requested main-branch protections:
+#   - Pull requests are required before merging.
+#   - The fast-validation status check must pass.
+#   - Stale reviews may be dismissed when reviews are enabled.
+#   - Repository auto-delete of merged head branches is enabled.
+#
+# This script intentionally does not configure Merge Queue, force-push rules,
+# or any other branch protection rule.
 # Requires: gh authenticated with repository administration permission.
 # Usage: ./setup-branch-protection.sh [owner/repo]
 
@@ -47,12 +52,9 @@ RULESET_JSON=$(cat <<'JSON'
         "do_not_enforce_on_create": false,
         "strict_required_status_checks_policy": false,
         "required_status_checks": [
-          { "context": "fast" }
+          { "context": "fast-validation" }
         ]
       }
-    },
-    {
-      "type": "block_force_pushes"
     }
   ]
 }
@@ -94,17 +96,16 @@ else
   echo "Created pull-request CI ruleset."
 fi
 
-# Auto-merge is a repository setting, not a ruleset rule. Enable it when the
-# authenticated token has administration permission; otherwise leave the
-# repository unchanged and let the PR UI/gh configure it manually.
+# Automatically delete branches after their pull requests are merged.
 if gh api --method PATCH \
     -H "Accept: application/vnd.github+json" \
     -H "X-GitHub-Api-Version: ${API_VERSION}" \
     "/repos/${OWNER}/${NAME}" \
-    -f allow_auto_merge=true >/dev/null 2>&1; then
-  echo "Auto-merge enabled for ${OWNER}/${NAME}."
+    -f delete_branch_on_merge=true >/dev/null 2>&1; then
+  echo "Automatic deletion of merged head branches enabled."
 else
-  echo "Auto-merge could not be enabled with this token; configure it manually in repository settings or on the PR." >&2
+  echo "Could not enable automatic branch deletion with this token; configure it manually in repository settings." >&2
 fi
 
-echo "main requires pull requests and the fast status check; force pushes are blocked."
+echo "Configured: pull requests + fast-validation."
+echo "No Merge Queue or other branch-protection rules were configured."
