@@ -8,58 +8,28 @@
 
     <Grid RowDefinitions="Auto,*,Auto,Auto" Padding="12">
 
-        <Picker x:Name="FilterPicker"
-                Title="Filtrar"
-                SelectedIndexChanged="OnFilterChanged"
-                TextColor="{DynamicResource TextPrimary}"
-                TitleColor="{DynamicResource TextSecondary}"
-                BackgroundColor="{DynamicResource Surface}"
-                Margin="0,0,0,8">
-            <Picker.ItemsSource>
-                <x:Array Type="{x:Type x:String}">
-                    <x:String>Todos</x:String>
-                    <x:String>Favoritos</x:String>
-                    <x:String>Recentes</x:String>
-                </x:Array>
-            </Picker.ItemsSource>
-        </Picker>
+        <Label x:Name="FilterLabel" Text="Filtro: Todos" FontSize="13"
+               TextColor="{DynamicResource TextSecondary}" Margin="0,0,0,8" />
 
-        <CollectionView x:Name="CardsCollection"
-                        Grid.Row="1"
-                        SelectionMode="None"
-                        ItemsLayout="VerticalGrid, 2">
+        <CollectionView x:Name="CardsCollection" Grid.Row="1" SelectionMode="None" ItemsLayout="VerticalGrid, 2">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:CardItem">
-                    <Border Stroke="{DynamicResource Border}"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 12"
-                            BackgroundColor="{DynamicResource CardBackground}"
-                            Margin="6"
-                            Padding="12">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="{Binding .}" />
-                            <SwipeGestureRecognizer Direction="Left" Swiped="OnCardSwiped" CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>
+                    <Border Stroke="{DynamicResource Border}" StrokeThickness="1"
+                            StrokeShape="RoundRectangle 12" BackgroundColor="{DynamicResource CardBackground}"
+                            Margin="6" Padding="12">
                         <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
-                            <Label Text="{Binding Icon}"
-                                   FontSize="32"
-                                   HorizontalOptions="Center"
-                                   Grid.ColumnSpan="2" />
-                            <Label Text="{Binding Title}"
-                                   FontSize="14"
-                                   FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextPrimary}"
-                                   HorizontalTextAlignment="Center"
-                                   LineBreakMode="TailTruncation"
-                                   Grid.Row="1"
-                                   Grid.ColumnSpan="2"
-                                   Margin="0,4,0,0" />
-                            <Label IsVisible="{Binding IsFavorite}"
-                                   Text="⭐"
-                                   FontSize="16"
-                                   Grid.Row="2"
-                                   Grid.Column="1"
-                                   HorizontalOptions="End" />
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+                            <Label Text="{Binding Icon}" FontSize="32" HorizontalOptions="Center" Grid.ColumnSpan="2" />
+                            <Label Text="{Binding Title}" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextPrimary}" HorizontalTextAlignment="Center"
+                                   LineBreakMode="TailTruncation" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,4,0,0" />
+                            <Button Text="⭐" FontSize="18" BackgroundColor="Transparent" Padding="0"
+                                    WidthRequest="40" HeightRequest="36" Grid.Row="2" Grid.Column="1"
+                                    HorizontalOptions="End" Clicked="OnFavoriteClicked" CommandParameter="{Binding .}" />
+                            <Label Text="Favorito" FontSize="10" TextColor="{DynamicResource TextSecondary}"
+                                   Grid.Row="2" VerticalOptions="Center" IsVisible="{Binding IsFavorite}" />
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -67,42 +37,18 @@
             <CollectionView.EmptyView>
                 <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="16">
                     <Label Text="🎰" FontSize="48" HorizontalOptions="Center" />
-                    <Label Text="Nenhum link adicionado"
-                           TextColor="{DynamicResource TextSecondary}"
-                           HorizontalOptions="Center" />
-                    <Label Text="Toque no + para adicionar a URL de um site"
-                           TextColor="{DynamicResource TextSecondary}"
-                           FontSize="12"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center" />
-                    <Label Text="Não sugerimos casas. Você escolhe os links."
-                           TextColor="{DynamicResource TextSecondary}"
-                           FontSize="11"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center"
-                           Margin="0,8,0,0" />
+                    <Label Text="Nenhum link neste filtro" TextColor="{DynamicResource TextSecondary}" HorizontalOptions="Center" />
+                    <Label Text="Use + para adicionar · menu para Todos/Favoritos/Recentes"
+                           TextColor="{DynamicResource TextSecondary}" FontSize="12" HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
         </CollectionView>
 
-        <Button x:Name="AddButton"
-                Grid.Row="2"
-                Text="＋"
-                FontSize="28"
-                WidthRequest="56"
-                HeightRequest="56"
-                CornerRadius="28"
-                BackgroundColor="{DynamicResource Primary}"
-                TextColor="White"
-                HorizontalOptions="End"
-                Margin="0,8,4,4"
-                Clicked="OnAddClicked" />
+        <Button Grid.Row="2" Text="＋" FontSize="28" WidthRequest="56" HeightRequest="56" CornerRadius="28"
+                BackgroundColor="{DynamicResource Primary}" TextColor="White" HorizontalOptions="End"
+                Margin="0,8,4,4" Clicked="OnAddClicked" />
 
-        <Label Grid.Row="3"
-               Text="Links de terceiros · 18+ · Não operamos jogos · Jogue com responsabilidade"
-               FontSize="10"
-               TextColor="{DynamicResource TextSecondary}"
-               HorizontalTextAlignment="Center"
-               Margin="0,4,0,0" />
+        <Label Grid.Row="3" Text="Links de terceiros · 18+ · Não operamos jogos" FontSize="10"
+               TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
     </Grid>
 </ContentPage>
