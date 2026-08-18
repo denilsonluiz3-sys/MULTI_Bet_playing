@@ -19,6 +19,8 @@ public sealed class UrlValidatorTests
     [InlineData("data:text/html,test")]
     [InlineData("file:///tmp/test")]
     [InlineData("content://local")]
+    [InlineData("intent://example.com")]
+    [InlineData("market://details?id=test")]
     public void RejectsBlockedSchemes(string input)
     {
         Assert.False(UrlValidator.TryNormalize(input, out _, out _));
@@ -28,23 +30,54 @@ public sealed class UrlValidatorTests
     [InlineData("http://localhost/test")]
     [InlineData("http://127.0.0.1/test")]
     [InlineData("http://10.0.0.1/test")]
+    [InlineData("http://172.16.0.1/test")]
+    [InlineData("http://172.31.255.254/test")]
     [InlineData("http://192.168.1.10/test")]
     [InlineData("http://169.254.1.1/test")]
-    public void RejectsLocalAndLinkLocalAddresses(string input)
+    [InlineData("http://[::1]/test")]
+    [InlineData("http://[fc00::1]/test")]
+    public void RejectsLocalPrivateAndLinkLocalAddresses(string input)
+    {
+        Assert.False(UrlValidator.TryNormalize(input, out _, out _));
+    }
+
+    [Theory]
+    [InlineData("http://8.8.8.8")]
+    [InlineData("https://example.com")]
+    public void AcceptsPublicHttpOrHttpsTargets(string input)
+    {
+        Assert.True(UrlValidator.TryNormalize(input, out _, out var error), error);
+    }
+
+    [Theory]
+    [InlineData("ftp://example.com")]
+    [InlineData("ws://example.com")]
+    [InlineData("file://example.com")]
+    public void RejectsUnsupportedProtocols(string input)
+    {
+        Assert.False(UrlValidator.TryNormalize(input, out _, out _));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void RejectsEmptyInput(string? input)
     {
         Assert.False(UrlValidator.TryNormalize(input, out _, out _));
     }
 
     [Fact]
-    public void AcceptsPublicHttpsUrl()
+    public void RejectsHostContainingSpaces()
     {
-        Assert.True(UrlValidator.TryNormalize("https://example.com", out var normalized, out var error), error);
-        Assert.True(UrlValidator.IsHttpsPreferred(normalized));
+        Assert.False(UrlValidator.TryNormalize("https://bad host.example", out _, out _));
     }
 
     [Fact]
-    public void RejectsUnsupportedScheme()
+    public void HttpsIsPreferredOnlyForHttps()
     {
-        Assert.False(UrlValidator.TryNormalize("ftp://example.com", out _, out _));
+        Assert.True(UrlValidator.IsHttpsPreferred("https://example.com"));
+        Assert.False(UrlValidator.IsHttpsPreferred("http://example.com"));
+        Assert.False(UrlValidator.IsHttpsPreferred("not-a-url"));
     }
 }
