@@ -16,6 +16,9 @@
 
     <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
     <AndroidPackageFormats>apk</AndroidPackageFormats>
+
+    <!-- Tests live in a separate net10.0 test project and must not be compiled into the MAUI app. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
