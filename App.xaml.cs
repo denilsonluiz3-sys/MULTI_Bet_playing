@@ -23,7 +23,7 @@ public partial class App : Application
     {
         try
         {
-            var root = ComplianceService.HasAccepted
+            Page root = ComplianceService.HasAccepted
                 ? new AppShell()
                 : new CompliancePage();
 
