@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MULTI_Bet_playing_Demo.Services;
 using MULTI_Bet_playing_Demo.Services.Logging;
 
 namespace MULTI_Bet_playing_Demo;
@@ -16,6 +18,9 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
+
+        builder.Services.AddSingleton<SpaPublicRegistrySource>();
+        builder.Services.AddSingleton<TrustSecurityEngine>();
 
         if (MultiBetLoggingOptions.Enabled)
             builder.Services.AddSingleton<IMultiBetLogger, MultiBetFileLogger>();
