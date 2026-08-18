@@ -1,11 +1,13 @@
-name: Project Validation
+name: CI
 
 env:
-  CI_SCHEMA_VERSION: '3'
+  DOTNET_VERSION: '10.0.x'
 
 on:
   pull_request:
     branches: [main]
+  merge_group:
+    types: [checks_requested]
   push:
     branches: [main]
   workflow_dispatch:
@@ -14,114 +16,97 @@ permissions:
   contents: read
 
 concurrency:
-  group: project-validation-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  fast-validation:
-    name: fast-validation
+  repository:
+    name: repository-integrity
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Validate repository structure
         shell: bash
         run: |
           set -euo pipefail
-          required_files=(
-            README.md
-            MauiProgram.cs
-            MULTI_Bet_playing_Demo.csproj
-            tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
-          )
-          required_dirs=(
-            Pages
-            Services
-            Models
-            Platforms/Android
-            tests
-          )
-
-          for path in "${required_files[@]}"; do
+          for path in \
+            README.md \
+            MauiProgram.cs \
+            MULTI_Bet_playing_Demo.csproj \
+            tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj \
+            Services/UrlValidator.cs \
+            Services/ComplianceService.cs \
+            Services/WebViewSecurity.cs \
+            Services/CardService.cs; do
             test -f "$path"
           done
-
-          for path in "${required_dirs[@]}"; do
+          for path in Pages Models Platforms/Android Services tests src/MULTI_Bet.Api src/MULTI_Bet.Infrastructure src/MULTI_Bet.Shared; do
             test -d "$path"
           done
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-          cache: true
-          cache-dependency-path: |
-            MULTI_Bet_playing_Demo.csproj
-            tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
-
-      - name: Restore application
-        run: dotnet restore MULTI_Bet_playing_Demo.csproj
-
-  test-validation:
-    name: test-validation
+  tests:
+    name: unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
           cache: true
           cache-dependency-path: |
             MULTI_Bet_playing_Demo.csproj
             tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
-
       - name: Restore tests
         run: dotnet restore tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
-
-      - name: Run unit tests
+      - name: Run tests
         run: dotnet test tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj --configuration Release --no-restore --verbosity normal
 
-  android-validation:
-    name: android-validation
+  backend:
+    name: backend-build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+          cache-dependency-path: |
+            src/MULTI_Bet.Shared/MULTI_Bet.Shared.csproj
+            src/MULTI_Bet.Infrastructure/MULTI_Bet.Infrastructure.csproj
+            src/MULTI_Bet.Api/MULTI_Bet.Api.csproj
+      - name: Restore backend
+        run: dotnet restore MULTI_Bet.sln
+      - name: Build backend solution
+        run: dotnet build MULTI_Bet.sln --configuration Release --no-restore
+
+  android:
+    name: android-build
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
           cache: true
           cache-dependency-path: MULTI_Bet_playing_Demo.csproj
-
       - name: Install MAUI Android workload
         run: dotnet workload install maui-android --skip-manifest-update
-
       - name: Restore application
         run: dotnet restore MULTI_Bet_playing_Demo.csproj
-
       - name: Build Android Debug
         run: dotnet build MULTI_Bet_playing_Demo.csproj --configuration Debug --framework net10.0-android --no-restore
 
-  security-validation:
-    name: security-validation
+  security:
+    name: secret-scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Scan repository for committed secrets
-        uses: gitleaks/gitleaks-action@v2
+      - uses: actions/checkout@v4
+      - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
