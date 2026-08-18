@@ -1,0 +1,77 @@
+name: Sync main into active branches
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-main
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Update open PR branches
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update open PR branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -u
+          prs="$(gh api --paginate "/repos/${REPO}/pulls?state=open&base=main&per_page=100" --jq '.[] | [.number, .head.ref, .head.repo.full_name] | @tsv')"
+          [ -n "$prs" ] || { echo 'No open PRs targeting main.'; exit 0; }
+          while IFS=$'\t' read -r number branch head_repo; do
+            [ "$head_repo" = "$REPO" ] || continue
+            echo "Updating PR #${number}: ${branch}"
+            gh api --method PUT "/repos/${REPO}/pulls/${number}/update-branch" \
+              -f update_method=merge >/dev/null || \
+              echo "PR #${number} could not be updated automatically; leaving it unchanged."
+          done <<< "$prs"
+
+      - name: Update active feature branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -u
+          git fetch origin main --prune
+          mapfile -t branches < <(gh api --paginate "/repos/${REPO}/branches?per_page=100" --jq '.[].name')
+          for branch in "${branches[@]}"; do
+            [ "$branch" != "main" ] || continue
+            case "$branch" in
+              auto-update/*|auto-repair/*) continue ;;
+            esac
+            echo "Checking ${branch}"
+            git fetch origin "refs/heads/${branch}:refs/remotes/origin/${branch}" || continue
+            worktree="$(mktemp -d)"
+            if ! git worktree add --detach "$worktree" "origin/${branch}" >/dev/null 2>&1; then
+              rm -rf "$worktree"
+              continue
+            fi
+            (
+              cd "$worktree"
+              git config user.name 'github-actions[bot]'
+              git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+              if git merge --no-edit origin/main; then
+                git push origin "HEAD:refs/heads/${branch}" || echo "${branch}: push blocked (likely branch protection)."
+              else
+                git merge --abort >/dev/null 2>&1 || true
+                echo "${branch}: conflict with main; left unchanged."
+              fi
+            )
+            git worktree remove --force "$worktree" >/dev/null 2>&1 || true
+            rm -rf "$worktree"
+          done
