@@ -1,0 +1,57 @@
+name: Fast CI / Merge Queue
+
+on:
+  pull_request:
+    branches: [ main ]
+  merge_group:
+    types: [ checks_requested ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fast-ci-${{ github.event.pull_request.number || github.event.merge_group.head_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  fast:
+    name: fast
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout merge-group SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.sha }}
+          fetch-depth: 1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore test project
+        run: dotnet restore tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
+
+      - name: Unit tests
+        run: dotnet test tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj --configuration Release --no-restore --verbosity normal
+
+  repository-integrity:
+    name: repository-integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout merge-group SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.sha }}
+          fetch-depth: 1
+      - name: Validate required project files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f MULTI_Bet_playing_Demo.csproj
+          test -f Services/UrlValidator.cs
+          test -f Services/TrustSecurityEngine.cs || true
+          test -f .github/workflows/build-android.yml
+          test -f .github/workflows/ci-merge-queue.yml
