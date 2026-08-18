@@ -52,6 +52,6 @@ jobs:
           set -euo pipefail
           test -f MULTI_Bet_playing_Demo.csproj
           test -f Services/UrlValidator.cs
-          test -f Services/TrustSecurityEngine.cs || true
+          test -f Services/TrustSecurityEngine.cs
           test -f .github/workflows/build-android.yml
           test -f .github/workflows/ci-merge-queue.yml
