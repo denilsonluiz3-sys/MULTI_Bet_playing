@@ -6,10 +6,7 @@ public sealed class Wallet
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
-    public decimal AvailableBalance { get; set; }
-    public decimal PendingBalance { get; set; }
     public string Currency { get; set; } = "BRL";
-    public byte[] Version { get; set; } = Array.Empty<byte>();
 }
 
 public sealed class WalletTransaction

@@ -13,10 +13,7 @@ public sealed class WalletDbContext(DbContextOptions<WalletDbContext> options) :
         {
             entity.ToTable("wallets");
             entity.HasKey(x => x.Id);
-            entity.Property(x => x.AvailableBalance).HasPrecision(18, 2);
-            entity.Property(x => x.PendingBalance).HasPrecision(18, 2);
             entity.Property(x => x.Currency).HasMaxLength(3).IsRequired();
-            entity.Property(x => x.Version).IsConcurrencyToken();
             entity.HasIndex(x => x.UserId).IsUnique();
         });
 
