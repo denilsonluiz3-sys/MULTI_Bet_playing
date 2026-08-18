@@ -17,11 +17,9 @@ public partial class HomePage : ContentPage
         FilterPicker.SelectedIndex = 0;
     }
 
-    private static CardService ResolveCardService()
-    {
-        return Application.Current?.Handler?.MauiContext?.Services?.GetService<CardService>()
-               ?? new CardService();
-    }
+    private static CardService ResolveCardService() =>
+        Application.Current?.Handler?.MauiContext?.Services?.GetService<CardService>()
+        ?? new CardService();
 
     protected override async void OnAppearing()
     {
@@ -52,28 +50,50 @@ public partial class HomePage : ContentPage
     private async void OnCardTapped(object? sender, TappedEventArgs e)
     {
         if (e.Parameter is not CardItem card) return;
+        await OpenCardAsync(card);
+    }
+
+    private async Task OpenCardAsync(CardItem card)
+    {
+        if (!UrlValidator.TryNormalize(card.Url, out var url, out var err))
+        {
+            await DisplayAlertAsync("URL inválida", err, "OK");
+            return;
+        }
+
         await _cardService.MarkUsedAsync(card.Id);
-        await Navigation.PushAsync(new WebViewPage(card.Url, card.Title));
+        await Navigation.PushAsync(new WebViewPage(url, card.Title));
     }
 
     private async void OnCardSwiped(object? sender, SwipedEventArgs e)
     {
         if (e.Parameter is not CardItem card) return;
+        await ShowCardMenuAsync(card);
+    }
 
-        var action = await DisplayActionSheet(card.Title, "Cancelar", null,
+    private async Task ShowCardMenuAsync(CardItem card)
+    {
+        var action = await DisplayActionSheetAsync(
+            card.Title,
+            "Cancelar",
+            null,
+            "Abrir",
             card.IsFavorite ? "Remover dos Favoritos" : "Adicionar aos Favoritos",
-            "Remover",
-            "Editar");
+            "Editar",
+            "Remover");
 
         switch (action)
         {
+            case "Abrir":
+                await OpenCardAsync(card);
+                break;
             case "Adicionar aos Favoritos":
             case "Remover dos Favoritos":
                 await _cardService.ToggleFavoriteAsync(card.Id);
                 await LoadCardsAsync();
                 break;
             case "Remover":
-                if (await DisplayAlert("Confirmar", $"Remover {card.Title}?", "Sim", "Não"))
+                if (await DisplayAlertAsync("Confirmar", $"Remover {card.Title}?", "Sim", "Não"))
                 {
                     await _cardService.RemoveCardAsync(card.Id);
                     await LoadCardsAsync();
@@ -87,20 +107,39 @@ public partial class HomePage : ContentPage
 
     private async void OnAddClicked(object? sender, EventArgs e)
     {
-        string? title = await DisplayPromptAsync("Novo Cassino", "Nome:", "Salvar", "Cancelar", "Ex: Bet365");
+        string? title = await DisplayPromptAsync("Novo link", "Nome (ex.: Site A):", "Salvar", "Cancelar");
         if (string.IsNullOrWhiteSpace(title)) return;
 
-        string? url = await DisplayPromptAsync("Novo Cassino", "URL:", "Salvar", "Cancelar", "https://");
-        if (string.IsNullOrWhiteSpace(url)) return;
+        string? urlInput = await DisplayPromptAsync(
+            "Novo link",
+            "URL (https://…):",
+            "Salvar",
+            "Cancelar",
+            "https://");
 
-        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
-            url = "https://" + url;
+        if (string.IsNullOrWhiteSpace(urlInput)) return;
+
+        if (!UrlValidator.TryNormalize(urlInput, out var url, out var error))
+        {
+            await DisplayAlertAsync("URL rejeitada", error, "OK");
+            return;
+        }
+
+        if (!UrlValidator.IsHttpsPreferred(url))
+        {
+            var okHttp = await DisplayAlertAsync(
+                "HTTP (não seguro)",
+                "A URL não usa HTTPS. Continuar mesmo assim?",
+                "Sim",
+                "Não");
+            if (!okHttp) return;
+        }
 
         await _cardService.AddCardAsync(new CardItem
         {
             Title = title.Trim(),
-            Url = url.Trim(),
-            Icon = "🎰",
+            Url = url,
+            Icon = "🔗",
             IsFavorite = false,
             LastUsed = DateTime.UtcNow
         });
@@ -112,14 +151,17 @@ public partial class HomePage : ContentPage
         string? title = await DisplayPromptAsync("Editar", "Nome:", "Salvar", "Cancelar", initialValue: card.Title);
         if (string.IsNullOrWhiteSpace(title)) return;
 
-        string? url = await DisplayPromptAsync("Editar", "URL:", "Salvar", "Cancelar", initialValue: card.Url);
-        if (string.IsNullOrWhiteSpace(url)) return;
+        string? urlInput = await DisplayPromptAsync("Editar", "URL:", "Salvar", "Cancelar", initialValue: card.Url);
+        if (string.IsNullOrWhiteSpace(urlInput)) return;
 
-        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
-            url = "https://" + url;
+        if (!UrlValidator.TryNormalize(urlInput, out var url, out var error))
+        {
+            await DisplayAlertAsync("URL rejeitada", error, "OK");
+            return;
+        }
 
         card.Title = title.Trim();
-        card.Url = url.Trim();
+        card.Url = url;
         await _cardService.UpdateCardAsync(card);
         await LoadCardsAsync();
     }
