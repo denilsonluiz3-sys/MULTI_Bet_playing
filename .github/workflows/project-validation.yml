@@ -1,0 +1,46 @@
+name: Project Validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fast-validation:
+    name: fast-validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate repository structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f README.md
+          test -f MULTI_Bet_playing_Demo.sln
+          test -d src
+          test -d tests
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore MULTI_Bet_playing_Demo.sln
+      - name: Build
+        run: dotnet build MULTI_Bet_playing_Demo.sln --configuration Release --no-restore
+      - name: Test
+        run: dotnet test MULTI_Bet_playing_Demo.sln --configuration Release --no-build --verbosity normal
+
+  security-validation:
+    name: security-validation
+    runs-on: ubuntu-latest
+    needs: fast-validation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan repository for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
