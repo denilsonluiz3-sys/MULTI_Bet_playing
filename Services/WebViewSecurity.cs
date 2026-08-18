@@ -1,5 +1,10 @@
 namespace MULTI_Bet_playing_Demo.Services;
 
+/// <summary>
+/// WebView compatível com sites reais.
+/// NÃO usa setSupportMultipleWindows(true) com a mesma WebView no OnCreateWindow —
+/// isso gera: "Parent WebView cannot host its own popup window".
+/// </summary>
 public static class WebViewSecurity
 {
     public const string ChromeMobileUa =
@@ -24,8 +29,11 @@ public static class WebViewSecurity
                 s.DatabaseEnabled = true;
                 s.LoadsImagesAutomatically = true;
                 s.MediaPlaybackRequiresUserGesture = false;
-                s.JavaScriptCanOpenWindowsAutomatically = true;
-                s.SetSupportMultipleWindows(true);
+
+                // Obrigatório false: Chromium proíbe a WebView hospedar o próprio popup
+                s.SetSupportMultipleWindows(false);
+                s.JavaScriptCanOpenWindowsAutomatically = false;
+
                 s.SetSupportZoom(true);
                 s.BuiltInZoomControls = true;
                 s.DisplayZoomControls = false;
@@ -47,7 +55,7 @@ public static class WebViewSecurity
                     cm.SetAcceptThirdPartyCookies(wv, true);
                 }
 
-                wv.SetWebChromeClient(new MultiBetChromeClient(wv));
+                wv.SetWebChromeClient(new MultiBetChromeClient());
             }
             catch { }
         });
@@ -70,22 +78,30 @@ public static class WebViewSecurity
 #if ANDROID
     sealed class MultiBetChromeClient : Android.Webkit.WebChromeClient
     {
-        private readonly Android.Webkit.WebView _host;
-        public MultiBetChromeClient(Android.Webkit.WebView host) => _host = host;
-
         public override bool OnCreateWindow(
-            Android.Webkit.WebView? view, bool isDialog, bool isUserGesture, Android.OS.Message? resultMsg)
+            Android.Webkit.WebView? view,
+            bool isDialog,
+            bool isUserGesture,
+            Android.OS.Message? resultMsg)
         {
             try
             {
-                if (resultMsg?.Obj is Android.Webkit.WebView.WebViewTransport transport)
+                var hit = view?.GetHitTestResult();
+                var extra = hit?.Extra;
+                if (!string.IsNullOrEmpty(extra) &&
+                    (extra.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                     extra.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
                 {
-                    transport.WebView = _host;
-                    resultMsg.SendToTarget();
+                    var intent = new Android.Content.Intent(Android.Content.Intent.ActionView,
+                        Android.Net.Uri.Parse(extra));
+                    intent.AddFlags(Android.Content.ActivityFlags.NewTask);
+                    Android.App.Application.Context.StartActivity(intent);
                     return true;
                 }
             }
             catch { }
+
+            // Nunca transport.WebView = view (mesma instância) → crash
             return false;
         }
 
