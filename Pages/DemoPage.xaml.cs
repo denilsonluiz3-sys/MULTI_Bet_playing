@@ -22,12 +22,26 @@ public partial class DemoPage : ContentPage
         Application.Current?.Handler?.MauiContext?.Services?.GetService<CardService>()
         ?? new CardService();
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        foreach (var wv in _webViews)
+            wv.IsVisible = false;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        foreach (var wv in _webViews)
+            wv.IsVisible = true;
+    }
+
     private async void OnLoadFavorites(object? sender, EventArgs e)
     {
         var favorites = await _cardService.GetFavoritesAsync();
         if (favorites.Count == 0)
         {
-            await DisplayAlert("Aviso", "Nenhum favorito encontrado. Adicione cassinos na aba Início.", "OK");
+            await DisplayAlert("Aviso", "Nenhum favorito. Adicione links na aba Inicio e marque como favorito.", "OK");
             return;
         }
 
@@ -35,9 +49,16 @@ public partial class DemoPage : ContentPage
         {
             if (i < favorites.Count)
             {
-                _webViews[i].Source = favorites[i].Url;
-                _labels[i].Text = favorites[i].Title;
-                await _cardService.MarkUsedAsync(favorites[i].Id);
+                var card = favorites[i];
+                if (!UrlValidator.TryNormalize(card.Url, out var url, out _))
+                {
+                    _webViews[i].Source = null;
+                    _labels[i].Text = $"Tela {i + 1} (URL invalida)";
+                    continue;
+                }
+                _webViews[i].Source = url;
+                _labels[i].Text = card.Title;
+                await _cardService.MarkUsedAsync(card.Id);
             }
             else
             {
