@@ -14,15 +14,16 @@ public partial class CompliancePage : ContentPage
     {
         if (AgeCheck.IsChecked != true || TermsCheck.IsChecked != true || RegionCheck.IsChecked != true)
         {
-            await DisplayAlert(
-                "Pend\u00eancias",
-                "Marque todas as confirma\u00e7\u00f5es (idade, termos e regi\u00e3o) para continuar.",
+            await DisplayAlertAsync(
+                "Pendências",
+                "Marque todas as confirmações (idade, termos e região) para continuar.",
                 "OK");
             return;
         }
 
         ComplianceService.Accept();
-        Application.Current!.MainPage = new AppShell();
+        if (Application.Current?.Windows.Count > 0)
+            Application.Current.Windows[0].Page = new AppShell();
     }
 
     private void OnExit(object? sender, EventArgs e)

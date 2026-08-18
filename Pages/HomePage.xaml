@@ -6,7 +6,7 @@
              Title="Início"
              BackgroundColor="{DynamicResource Background}">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="12">
+    <Grid RowDefinitions="Auto,*,Auto,Auto" Padding="12">
 
         <Picker x:Name="FilterPicker"
                 Title="Filtrar"
@@ -54,8 +54,7 @@
                                    Grid.Row="1"
                                    Grid.ColumnSpan="2"
                                    Margin="0,4,0,0" />
-                            <Label Text="{Binding IsFavorite, StringFormat='{0}'}"
-                                   IsVisible="{Binding IsFavorite}"
+                            <Label IsVisible="{Binding IsFavorite}"
                                    Text="⭐"
                                    FontSize="16"
                                    Grid.Row="2"
@@ -66,15 +65,22 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
             <CollectionView.EmptyView>
-                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="16">
                     <Label Text="🎰" FontSize="48" HorizontalOptions="Center" />
-                    <Label Text="Nenhum cassino adicionado"
+                    <Label Text="Nenhum link adicionado"
                            TextColor="{DynamicResource TextSecondary}"
                            HorizontalOptions="Center" />
-                    <Label Text="Toque no + para adicionar"
+                    <Label Text="Toque no + para adicionar a URL de um site"
                            TextColor="{DynamicResource TextSecondary}"
                            FontSize="12"
-                           HorizontalOptions="Center" />
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Não sugerimos casas. Você escolhe os links."
+                           TextColor="{DynamicResource TextSecondary}"
+                           FontSize="11"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,8,0,0" />
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
         </CollectionView>
@@ -89,7 +95,14 @@
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="White"
                 HorizontalOptions="End"
-                Margin="0,12,4,4"
+                Margin="0,8,4,4"
                 Clicked="OnAddClicked" />
+
+        <Label Grid.Row="3"
+               Text="Links de terceiros · 18+ · Não operamos jogos · Jogue com responsabilidade"
+               FontSize="10"
+               TextColor="{DynamicResource TextSecondary}"
+               HorizontalTextAlignment="Center"
+               Margin="0,4,0,0" />
     </Grid>
 </ContentPage>

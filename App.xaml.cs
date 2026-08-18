@@ -9,9 +9,13 @@ public partial class App : Application
     {
         InitializeComponent();
         ThemeManager.ApplySavedTheme();
+    }
 
-        MainPage = ComplianceService.HasAccepted
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        Page root = ComplianceService.HasAccepted
             ? new AppShell()
             : new CompliancePage();
+        return new Window(root);
     }
 }
