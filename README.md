@@ -54,6 +54,7 @@ GREEN = validado pelo CI
 - O job `fast` é o check destinado a ser obrigatório para a fila.
 - `.github/workflows/build-android.yml` continua responsável pelo build/publicação Android e não é colocado no caminho rápido da fila.
 - `.github/workflows/auto-update-pr.yml` tenta atualizar automaticamente PRs internos quando `main` recebe um novo commit.
+- `.github/workflows/auto-merge-queue.yml` habilita o auto-merge para PRs internos não-draft, colocando-os automaticamente no fluxo de Merge Queue quando os requisitos estiverem satisfeitos.
 - `.github/scripts/setup-branch-protection.sh` configura a proteção/ruleset de `main`, incluindo Merge Queue e somente o check rápido como obrigatório.
 
 O GitHub Merge Queue executa os checks no SHA temporário do grupo de merge; o workflow usa `github.event.merge_group.head_sha` explicitamente. O build Android pesado permanece paralelo/pós-merge para não transformar o fluxo cotidiano em uma espera desnecessária.
@@ -66,6 +67,7 @@ Os testes rápidos ficam em `tests/MULTI_Bet_playing_Demo.Tests/` e atualmente c
 
 - Fast CI / Merge Queue: `.github/workflows/ci-merge-queue.yml`
 - Auto-update de PRs: `.github/workflows/auto-update-pr.yml`
+- Auto-enqueue/auto-merge: `.github/workflows/auto-merge-queue.yml`
 - Build Android: `.github/workflows/build-android.yml`
 
 ---
