@@ -36,6 +36,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="src/**/*.cs" />
+    <Compile Remove="tests/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFD700" />
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0D0D0D" BaseSize="128,128" />
   </ItemGroup>
