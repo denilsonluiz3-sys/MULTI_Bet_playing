@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MULTI_Bet_playing_Demo.Pages.LogsPage"
+             Title="Logs"
+             BackgroundColor="{DynamicResource Background}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="10">
+
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Diagnóstico do app"
+                   FontAttributes="Bold"
+                   FontSize="18"
+                   TextColor="{DynamicResource TextPrimary}" />
+            <Label x:Name="PathLabel"
+                   FontSize="11"
+                   TextColor="{DynamicResource TextSecondary}"
+                   LineBreakMode="TailTruncation" />
+        </VerticalStackLayout>
+
+        <Editor x:Name="LogViewer"
+                Grid.Row="1"
+                TextColor="{DynamicResource TextPrimary}"
+                BackgroundColor="{DynamicResource Surface}"
+                FontFamily="monospace"
+                FontSize="11"
+                IsReadOnly="True"
+                AutoSize="Disabled"
+                VerticalOptions="Fill" />
+
+        <VerticalStackLayout Grid.Row="2" Spacing="8">
+            <Button Text="Recarregar"
+                    Clicked="OnRefresh"
+                    BackgroundColor="{DynamicResource Primary}"
+                    TextColor="White" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Button Text="Copiar"
+                        Clicked="OnCopy"
+                        BackgroundColor="{DynamicResource Surface}"
+                        TextColor="{DynamicResource TextPrimary}"
+                        BorderColor="{DynamicResource Border}"
+                        BorderWidth="1" />
+                <Button Grid.Column="1"
+                        Text="Compartilhar"
+                        Clicked="OnShare"
+                        BackgroundColor="{DynamicResource Surface}"
+                        TextColor="{DynamicResource TextPrimary}"
+                        BorderColor="{DynamicResource Border}"
+                        BorderWidth="1" />
+            </Grid>
+            <Button Text="Limpar log"
+                    Clicked="OnClear"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Accent}"
+                    FontSize="13" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

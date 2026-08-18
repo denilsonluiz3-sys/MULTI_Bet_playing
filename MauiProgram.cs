@@ -8,6 +8,10 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        AppLog.WireGlobalExceptionHandlers();
+        AppLog.Init();
+        AppLog.Info("MauiProgram.CreateMauiApp");
+
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -27,11 +31,14 @@ public static class MauiProgram
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<WebViewPage>();
         builder.Services.AddTransient<CompliancePage>();
+        builder.Services.AddTransient<LogsPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
 
-        return builder.Build();
+        var app = builder.Build();
+        AppLog.Info("MauiApp built");
+        return app;
     }
 }
