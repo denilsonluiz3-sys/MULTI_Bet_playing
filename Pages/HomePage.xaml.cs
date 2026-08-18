@@ -47,61 +47,35 @@ public partial class HomePage : ContentPage
             _ => await _cardService.GetCardsAsync()
         };
 
-        var all = await _cardService.GetCardsAsync();
-        var favCount = all.Count(c => c.IsFavorite);
-        AppLog.Info($"HomePage.Load filter={filter} lista={cards.Count} total={all.Count} fav={favCount}");
-
         CardsCollection.ItemsSource = null;
         CardsCollection.ItemsSource = cards;
     }
 
     private async void OnCardTapped(object? sender, TappedEventArgs e)
     {
-        CardItem? card = e.Parameter as CardItem;
-        if (card == null && sender is Element el)
-            card = el.BindingContext as CardItem;
-        if (card == null) return;
+        var card = e.Parameter as CardItem ?? (sender as Element)?.BindingContext as CardItem;
+        if (card is null) return;
         await OpenCardAsync(card);
     }
 
     private async void OnFavoriteClicked(object? sender, EventArgs e)
     {
-        CardItem? card = null;
-        if (sender is BindableObject bo)
-            card = bo.BindingContext as CardItem;
-        if (card == null && sender is Button btn)
-            card = btn.CommandParameter as CardItem;
+        var card = (sender as BindableObject)?.BindingContext as CardItem;
+        if (card is null) return;
 
-        if (card == null)
-        {
-            AppLog.Warning("OnFavoriteClicked: card null (BindingContext/CommandParameter)");
-            await DisplayAlertAsync("Favorito", "Não foi possível identificar o card. Tente de novo.", "OK");
-            return;
-        }
-
-        AppLog.Info($"OnFavoriteClicked: {card.Title} id={card.Id} antes={card.IsFavorite}");
         await _cardService.ToggleFavoriteAsync(card.Id);
-
-        var updated = (await _cardService.GetCardsAsync()).FirstOrDefault(c => c.Id == card.Id);
-        var nowFav = updated?.IsFavorite ?? !card.IsFavorite;
-        await DisplayAlertAsync(
-            nowFav ? "Favorito" : "Removido",
-            nowFav ? $"“{card.Title}” marcado como favorito." : $"“{card.Title}” removido dos favoritos.",
-            "OK");
-
         await LoadCardsAsync();
     }
 
     private async void OnCardSwiped(object? sender, SwipedEventArgs e)
     {
-        var card = e.Parameter as CardItem
-            ?? (sender as BindableObject)?.BindingContext as CardItem;
-        if (card == null) return;
+        var card = e.Parameter as CardItem ?? (sender as BindableObject)?.BindingContext as CardItem;
+        if (card is null) return;
 
         var action = await DisplayActionSheetAsync(
             card.Title, "Cancelar", null,
             card.IsFavorite ? "Remover dos Favoritos" : "Adicionar aos Favoritos",
-            "Abrir", "Remover link");
+            "Mudar categoria", "Abrir", "Remover link");
 
         switch (action)
         {
@@ -109,6 +83,9 @@ public partial class HomePage : ContentPage
             case "Remover dos Favoritos":
                 await _cardService.ToggleFavoriteAsync(card.Id);
                 await LoadCardsAsync();
+                break;
+            case "Mudar categoria":
+                await ChangeCategoryAsync(card);
                 break;
             case "Abrir":
                 await OpenCardAsync(card);
@@ -123,26 +100,35 @@ public partial class HomePage : ContentPage
         }
     }
 
+    private async Task ChangeCategoryAsync(CardItem card)
+    {
+        var categories = new[] { "Esportes", "Cassino", "Slots", "Favoritos", "Verificados", "Outros" };
+        var choice = await DisplayActionSheetAsync("Categoria", "Cancelar", null, categories);
+        if (string.IsNullOrWhiteSpace(choice) || choice == "Cancelar") return;
+
+        card.Category = choice;
+        await _cardService.UpdateCardAsync(card);
+        await LoadCardsAsync();
+    }
+
     private async Task OpenCardAsync(CardItem card)
     {
         if (!UrlValidator.TryNormalize(card.Url, out var url, out var err))
         {
-            AppLog.Warning($"URL inválida: {err}");
             await DisplayAlertAsync("URL inválida", err, "OK");
             return;
         }
 
         await _cardService.MarkUsedAsync(card.Id);
-        AppLog.Info($"Abrir WebView: {card.Title}");
         await Navigation.PushAsync(new WebViewPage(url, card.Title));
     }
 
     private async void OnAddClicked(object? sender, EventArgs e)
     {
-        string? title = await DisplayPromptAsync("Novo link", "Nome:", "Salvar", "Cancelar");
+        var title = await DisplayPromptAsync("Novo link", "Nome:", "Salvar", "Cancelar");
         if (string.IsNullOrWhiteSpace(title)) return;
 
-        string? urlInput = await DisplayPromptAsync("Novo link", "URL (https://…):", "Salvar", "Cancelar", "https://");
+        var urlInput = await DisplayPromptAsync("Novo link", "URL (https://…):", "Salvar", "Cancelar", "https://");
         if (string.IsNullOrWhiteSpace(urlInput)) return;
 
         if (!UrlValidator.TryNormalize(urlInput, out var url, out var error))
@@ -151,20 +137,26 @@ public partial class HomePage : ContentPage
             return;
         }
 
-        if (!UrlValidator.IsHttpsPreferred(url))
-        {
-            if (!await DisplayAlertAsync("HTTP", "URL sem HTTPS. Continuar?", "Sim", "Não"))
-                return;
-        }
+        if (!UrlValidator.IsHttpsPreferred(url) &&
+            !await DisplayAlertAsync("HTTP", "URL sem HTTPS. Continuar?", "Sim", "Não"))
+            return;
+
+        var category = await DisplayActionSheetAsync(
+            "Categoria", "Cancelar", null,
+            "Esportes", "Cassino", "Slots", "Outros");
+        if (string.IsNullOrWhiteSpace(category) || category == "Cancelar")
+            category = "Outros";
 
         await _cardService.AddCardAsync(new CardItem
         {
             Title = title.Trim(),
             Url = url,
             Icon = "🔗",
+            Category = category,
             IsFavorite = false,
             LastUsed = DateTime.UtcNow
         });
+
         await LoadCardsAsync();
     }
 }

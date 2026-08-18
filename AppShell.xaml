@@ -18,6 +18,10 @@
         <ShellContent Title="Jogar Demo" ContentTemplate="{DataTemplate pages:DemoPage}" Route="demo" />
     </TabBar>
 
+    <FlyoutItem Title="🛡️ Verificar plataforma" Route="security_item">
+        <ShellContent Title="Verificar" ContentTemplate="{DataTemplate pages:SecurityPage}" Route="security" />
+    </FlyoutItem>
+
     <FlyoutItem Title="⚙️ Configurações" Route="settings_item">
         <ShellContent Title="Configurações" ContentTemplate="{DataTemplate pages:SettingsPage}" Route="settings" />
     </FlyoutItem>

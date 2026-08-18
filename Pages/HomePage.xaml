@@ -7,7 +7,6 @@
              BackgroundColor="{DynamicResource Background}">
 
     <Grid RowDefinitions="Auto,*,Auto,Auto" Padding="12">
-
         <Label x:Name="FilterLabel" Text="Filtro: Todos" FontSize="13"
                TextColor="{DynamicResource TextSecondary}" Margin="0,0,0,8" />
 
@@ -21,19 +20,20 @@
                             <TapGestureRecognizer Tapped="OnCardTapped" CommandParameter="{Binding .}" />
                             <SwipeGestureRecognizer Direction="Left" Swiped="OnCardSwiped" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
-                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="4">
-                            <Label Text="{Binding Icon}" FontSize="28" HorizontalOptions="Center" Grid.ColumnSpan="2" />
+                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="4">
+                            <Label Text="{Binding Icon}" FontSize="28" HorizontalOptions="Center" />
                             <Label Text="{Binding Title}" FontSize="13" FontAttributes="Bold"
                                    TextColor="{DynamicResource TextPrimary}" HorizontalTextAlignment="Center"
-                                   LineBreakMode="TailTruncation" Grid.Row="1" Grid.ColumnSpan="2" />
+                                   LineBreakMode="TailTruncation" Grid.Row="1" />
+                            <Label Text="{Binding Category}" FontSize="11" HorizontalTextAlignment="Center"
+                                   TextColor="{DynamicResource TextSecondary}" Grid.Row="2" />
                             <Button Text="⭐ Favorito"
                                     FontSize="12"
                                     BackgroundColor="{DynamicResource Primary}"
                                     TextColor="White"
                                     HeightRequest="36"
                                     Padding="8,0"
-                                    Grid.Row="2"
-                                    Grid.ColumnSpan="2"
+                                    Grid.Row="3"
                                     HorizontalOptions="Fill"
                                     Clicked="OnFavoriteClicked"
                                     CommandParameter="{Binding .}" />

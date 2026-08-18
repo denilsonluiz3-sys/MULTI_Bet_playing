@@ -19,7 +19,10 @@ public static class MauiProgram
         WebViewSecurity.ConfigureHandlers();
 
         builder.Services.AddSingleton<CardService>();
+        builder.Services.AddSingleton<SpaPublicRegistrySource>();
+        builder.Services.AddSingleton<TrustSecurityEngine>();
         builder.Services.AddTransient<HomePage>();
+        builder.Services.AddTransient<SecurityPage>();
         builder.Services.AddTransient<DemoPage>();
         builder.Services.AddTransient<PlayPage>();
         builder.Services.AddTransient<SettingsPage>();
