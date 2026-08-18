@@ -5,31 +5,47 @@
              Title="Play"
              BackgroundColor="{DynamicResource Background}">
 
-    <Grid RowDefinitions="Auto,*" Padding="4" RowSpacing="4">
-        <ScrollView Orientation="Horizontal" HeightRequest="48">
-            <HorizontalStackLayout Spacing="6" Padding="4,0">
-                <Button Text="Favoritos" Clicked="OnLoadFavorites" BackgroundColor="{DynamicResource Primary}" TextColor="White" FontSize="11" HeightRequest="36" Padding="10,0" />
-                <Button Text="Escolher" Clicked="OnPickSlots" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}" BorderColor="{DynamicResource Border}" BorderWidth="1" FontSize="11" HeightRequest="36" Padding="10,0" />
-                <Button Text="⇄ Trocar" Clicked="OnSwap" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}" BorderColor="{DynamicResource Border}" BorderWidth="1" FontSize="11" HeightRequest="36" Padding="10,0" />
-                <Button x:Name="MuteAllBtn" Text="🔇 Mute" Clicked="OnMuteAll" BackgroundColor="{DynamicResource Secondary}" TextColor="Black" FontSize="11" HeightRequest="36" Padding="10,0" />
-                <Button Text="⛶ 1" Clicked="OnExpandLeft" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}" BorderColor="{DynamicResource Border}" BorderWidth="1" FontSize="11" HeightRequest="36" Padding="10,0" />
-                <Button Text="⛶ 2" Clicked="OnExpandRight" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}" BorderColor="{DynamicResource Border}" BorderWidth="1" FontSize="11" HeightRequest="36" Padding="10,0" />
-                <Button Text="⛶ 1+2" Clicked="OnRestoreBoth" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}" BorderColor="{DynamicResource Border}" BorderWidth="1" FontSize="11" HeightRequest="36" Padding="10,0" />
-                <Button Text="↻" Clicked="OnReloadAll" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}" BorderColor="{DynamicResource Border}" BorderWidth="1" FontSize="11" HeightRequest="36" Padding="10,0" />
-                <Button Text="Limpar" Clicked="OnClearAll" BackgroundColor="{DynamicResource Accent}" TextColor="White" FontSize="11" HeightRequest="36" Padding="10,0" />
-            </HorizontalStackLayout>
-        </ScrollView>
+    <Grid RowDefinitions="32,*" Padding="2" RowSpacing="2">
 
-        <Grid x:Name="ScreensGrid" Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="4" Margin="2">
-            <Border x:Name="BorderLeft" Grid.Column="0" Stroke="{DynamicResource Border}" StrokeThickness="1" StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
-                <Grid RowDefinitions="Auto,*">
-                    <Label x:Name="LabelLeft" Text="Tela 1" FontSize="11" TextColor="{DynamicResource TextSecondary}" LineBreakMode="TailTruncation" Margin="6,4" />
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="2" Padding="2,0">
+            <Label x:Name="StatusLabel" Text="Play" FontSize="11" TextColor="{DynamicResource TextSecondary}"
+                   VerticalOptions="Center" LineBreakMode="TailTruncation" />
+            <Button Grid.Column="1" Text="⭐" Clicked="OnLoadFavorites" FontSize="14"
+                    HeightRequest="28" WidthRequest="36" Padding="0"
+                    BackgroundColor="{DynamicResource Primary}" TextColor="White" />
+            <Button Grid.Column="2" Text="＋" Clicked="OnPickSlots" FontSize="14"
+                    HeightRequest="28" WidthRequest="36" Padding="0"
+                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+            <Button Grid.Column="3" Text="⇄" Clicked="OnSwap" FontSize="14"
+                    HeightRequest="28" WidthRequest="36" Padding="0"
+                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+            <Button Grid.Column="4" x:Name="MuteAllBtn" Text="🔇" Clicked="OnMuteAll" FontSize="14"
+                    HeightRequest="28" WidthRequest="36" Padding="0"
+                    BackgroundColor="{DynamicResource Secondary}" TextColor="Black" />
+            <Button Grid.Column="5" Text="⛶" Clicked="OnFullMenu" FontSize="14"
+                    HeightRequest="28" WidthRequest="36" Padding="0"
+                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+            <Button Grid.Column="6" Text="⋮" Clicked="OnMoreMenu" FontSize="16"
+                    HeightRequest="28" WidthRequest="36" Padding="0"
+                    BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
+                    BorderColor="{DynamicResource Border}" BorderWidth="1" />
+        </Grid>
+
+        <Grid x:Name="ScreensGrid" Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="2">
+            <Border x:Name="BorderLeft" Grid.Column="0" Stroke="{DynamicResource Border}" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 4" BackgroundColor="{DynamicResource Surface}" Padding="0">
+                <Grid RowDefinitions="18,*">
+                    <Label x:Name="LabelLeft" Text="1" FontSize="10" TextColor="{DynamicResource TextSecondary}" Margin="4,1" LineBreakMode="TailTruncation" />
                     <WebView x:Name="WebViewLeft" Grid.Row="1" />
                 </Grid>
             </Border>
-            <Border x:Name="BorderRight" Grid.Column="1" Stroke="{DynamicResource Border}" StrokeThickness="1" StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
-                <Grid RowDefinitions="Auto,*">
-                    <Label x:Name="LabelRight" Text="Tela 2" FontSize="11" TextColor="{DynamicResource TextSecondary}" LineBreakMode="TailTruncation" Margin="6,4" />
+            <Border x:Name="BorderRight" Grid.Column="1" Stroke="{DynamicResource Border}" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 4" BackgroundColor="{DynamicResource Surface}" Padding="0">
+                <Grid RowDefinitions="18,*">
+                    <Label x:Name="LabelRight" Text="2" FontSize="10" TextColor="{DynamicResource TextSecondary}" Margin="4,1" LineBreakMode="TailTruncation" />
                     <WebView x:Name="WebViewRight" Grid.Row="1" />
                 </Grid>
             </Border>
