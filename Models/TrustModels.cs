@@ -45,4 +45,6 @@ public sealed record PublicOperatorRecord(
     IReadOnlyList<string> Brands,
     IReadOnlyList<string> Domains,
     string Authorization,
-    string? Process = null);
+    string? Process = null,
+    bool IsJudicial = false,
+    string? SourceName = null);
