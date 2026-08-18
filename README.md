@@ -48,16 +48,16 @@ ACTIONS
 GREEN = validado pelo CI
 ```
 
-### CI rápido e Merge Queue
+### CI rápido e automação de merge
 
-- `.github/workflows/ci-merge-queue.yml` executa os testes rápidos em `pull_request` e `merge_group`.
-- O job `fast` é o check destinado a ser obrigatório para a fila.
-- `.github/workflows/build-android.yml` continua responsável pelo build/publicação Android e não é colocado no caminho rápido da fila.
+- `.github/workflows/ci-merge-queue.yml` executa o check rápido `fast-validation` em `pull_request` e também está preparado para o evento `merge_group` caso a Merge Queue esteja disponível no contexto do repositório.
+- O único status check obrigatório do ruleset atual é `fast-validation`.
+- `.github/workflows/build-android.yml` continua responsável pelo build/publicação Android e não é colocado no caminho rápido.
 - `.github/workflows/auto-update-pr.yml` tenta atualizar automaticamente PRs internos quando `main` recebe um novo commit.
-- `.github/workflows/auto-merge-queue.yml` habilita o auto-merge para PRs internos não-draft, colocando-os automaticamente no fluxo de Merge Queue quando os requisitos estiverem satisfeitos.
-- `.github/scripts/setup-branch-protection.sh` configura a proteção/ruleset de `main`, incluindo Merge Queue e somente o check rápido como obrigatório.
+- `.github/workflows/auto-merge-queue.yml` habilita auto-merge para PRs internos não-draft quando os requisitos do repositório forem satisfeitos.
+- `.github/scripts/setup-branch-protection.sh` configura apenas Pull Request, o check `fast-validation` e a exclusão automática de branches após merge.
 
-O GitHub Merge Queue executa os checks no SHA temporário do grupo de merge; o workflow usa `github.event.merge_group.head_sha` explicitamente. O build Android pesado permanece paralelo/pós-merge para não transformar o fluxo cotidiano em uma espera desnecessária.
+> **Nota sobre Merge Queue:** a API do GitHub rejeitou a regra `merge_queue` neste repositório (`422: Invalid rule 'merge_queue'`). Portanto, ela não é configurada artificialmente. O workflow mantém o suporte ao evento `merge_group` para compatibilidade futura, enquanto o fluxo atual usa auto-merge + CI rápido.
 
 ### Testes
 
@@ -65,9 +65,9 @@ Os testes rápidos ficam em `tests/MULTI_Bet_playing_Demo.Tests/` e atualmente c
 
 ## CI
 
-- Fast CI / Merge Queue: `.github/workflows/ci-merge-queue.yml`
+- Fast CI: `.github/workflows/ci-merge-queue.yml`
 - Auto-update de PRs: `.github/workflows/auto-update-pr.yml`
-- Auto-enqueue/auto-merge: `.github/workflows/auto-merge-queue.yml`
+- Auto-merge: `.github/workflows/auto-merge-queue.yml`
 - Build Android: `.github/workflows/build-android.yml`
 
 ---
