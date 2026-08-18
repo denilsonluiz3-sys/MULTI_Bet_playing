@@ -1,10 +1,11 @@
 name: Project Validation
 
 env:
-  CI_SCHEMA_VERSION: '2'
+  CI_SCHEMA_VERSION: '3'
 
 on:
   pull_request:
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
@@ -22,113 +23,104 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Validate repository structure
         shell: bash
         run: |
           set -euo pipefail
-          test -f README.md
-          test -f MauiProgram.cs
-          test -d Pages
-          test -d Services
-          test -d Models
-          test -d Platforms/Android
-          find . -maxdepth 3 -type f -name '*.csproj' -not -path './tests/*' -print -quit | grep -q .
-          find tests -type f -name '*.csproj' -print -quit | grep -q .
+          required_files=(
+            README.md
+            MauiProgram.cs
+            MULTI_Bet_playing_Demo.csproj
+            tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
+          )
+          required_dirs=(
+            Pages
+            Services
+            Models
+            Platforms/Android
+            tests
+          )
+
+          for path in "${required_files[@]}"; do
+            test -f "$path"
+          done
+
+          for path in "${required_dirs[@]}"; do
+            test -d "$path"
+          done
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: |
+            MULTI_Bet_playing_Demo.csproj
+            tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
 
       - name: Restore application
-        shell: bash
-        run: |
-          set -euo pipefail
-          app_project="$(find . -maxdepth 3 -type f -name '*.csproj' -not -path './tests/*' -print -quit)"
-          test -n "$app_project"
-          dotnet restore "${app_project#./}"
+        run: dotnet restore MULTI_Bet_playing_Demo.csproj
 
   test-validation:
     name: test-validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Locate test projects
-        id: projects
-        shell: bash
-        run: |
-          set -euo pipefail
-          test_projects="$(find tests -type f -name '*.csproj' -print)"
-          test -n "$test_projects"
-          {
-            echo 'test_projects<<EOF'
-            printf '%s\n' "$test_projects"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: |
+            MULTI_Bet_playing_Demo.csproj
+            tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
 
       - name: Restore tests
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r project; do
-            test -z "$project" && continue
-            dotnet restore "$project"
-          done <<< '${{ steps.projects.outputs.test_projects }}'
+        run: dotnet restore tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
 
       - name: Run unit tests
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r project; do
-            test -z "$project" && continue
-            dotnet test "$project" --configuration Release --no-restore --verbosity normal
-          done <<< '${{ steps.projects.outputs.test_projects }}'
+        run: dotnet test tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj --configuration Release --no-restore --verbosity normal
 
   android-validation:
     name: android-validation
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Locate application project
-        id: project
-        shell: bash
-        run: |
-          set -euo pipefail
-          app_project="$(find . -maxdepth 3 -type f -name '*.csproj' -not -path './tests/*' -print -quit)"
-          test -n "$app_project"
-          echo "app_project=${app_project#./}" >> "$GITHUB_OUTPUT"
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: MULTI_Bet_playing_Demo.csproj
 
       - name: Install MAUI Android workload
-        run: dotnet workload install maui-android
+        run: dotnet workload install maui-android --skip-manifest-update
 
       - name: Restore application
-        run: dotnet restore "${{ steps.project.outputs.app_project }}"
+        run: dotnet restore MULTI_Bet_playing_Demo.csproj
 
       - name: Build Android Debug
-        run: dotnet build "${{ steps.project.outputs.app_project }}" --configuration Debug --framework net10.0-android --no-restore
+        run: dotnet build MULTI_Bet_playing_Demo.csproj --configuration Debug --framework net10.0-android --no-restore
 
   security-validation:
     name: security-validation
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Scan repository for committed secrets
         uses: gitleaks/gitleaks-action@v2
         env:
