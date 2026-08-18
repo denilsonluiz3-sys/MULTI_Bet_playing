@@ -1,0 +1,31 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## MAUI / Android
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+local.properties
+*.jks
+*.keystore
+
+## OS
+.DS_Store
+Thumbs.db
+
+## IDE
+.idea/
+*.swp
+*~
