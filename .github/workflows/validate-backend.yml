@@ -1,0 +1,31 @@
+name: Validate Backend
+
+on:
+  push:
+    branches: [ main, 'feat/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore backend projects
+        run: |
+          dotnet restore src/MULTI_Bet.Shared/MULTI_Bet.Shared.csproj
+          dotnet restore src/MULTI_Bet.Infrastructure/MULTI_Bet.Infrastructure.csproj
+          dotnet restore src/MULTI_Bet.Api/MULTI_Bet.Api.csproj
+
+      - name: Build backend projects
+        run: |
+          dotnet build src/MULTI_Bet.Shared/MULTI_Bet.Shared.csproj -c Release --no-restore
+          dotnet build src/MULTI_Bet.Infrastructure/MULTI_Bet.Infrastructure.csproj -c Release --no-restore
+          dotnet build src/MULTI_Bet.Api/MULTI_Bet.Api.csproj -c Release --no-restore

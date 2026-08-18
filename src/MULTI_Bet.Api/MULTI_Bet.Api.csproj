@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MULTI_Bet.Shared\MULTI_Bet.Shared.csproj" />
+    <ProjectReference Include="..\MULTI_Bet.Infrastructure\MULTI_Bet.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

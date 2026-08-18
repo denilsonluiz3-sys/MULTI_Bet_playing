@@ -23,11 +23,9 @@
     <AndroidLinkTool>r8</AndroidLinkTool>
     <AndroidCreateProguardMappingFile>true</AndroidCreateProguardMappingFile>
     <AndroidProguardMappingFile>$(OutputPath)mapping.txt</AndroidProguardMappingFile>
-
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
-
     <RunAOTCompilation>false</RunAOTCompilation>
   </PropertyGroup>
 
@@ -48,7 +46,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.90" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
   </ItemGroup>
 
 </Project>

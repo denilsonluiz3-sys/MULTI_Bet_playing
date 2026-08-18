@@ -21,6 +21,17 @@ local.properties
 *.jks
 *.keystore
 
+## Secrets / local configuration
+.env
+.env.*
+!.env.example
+*.p12
+*.pem
+*.pfx
+appsettings.Production.json
+secrets.json
+**/appsettings.*.local.json
+
 ## OS
 .DS_Store
 Thumbs.db
