@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Configures main for GitHub Merge Queue.
+# Configures the main branch with repository rules that are supported without
+# GitHub Merge Queue. The repository is owned by a personal account, so this
+# script intentionally does NOT create or reference a merge_queue rule.
 # Requires: gh authenticated with repository administration permission.
 # Usage: ./setup-branch-protection.sh [owner/repo]
 
 REPO="${1:-${GITHUB_REPOSITORY:-denilsonluiz3-sys/MULTI_Bet_playing_Demo}}"
-RULESET_NAME="MULTI_Bet main — Merge Queue"
 API_VERSION="2022-11-28"
+RULESET_NAME="MULTI_Bet main — Pull Request CI"
 
 command -v gh >/dev/null || { echo "gh CLI is required" >&2; exit 1; }
 gh auth status >/dev/null
@@ -15,11 +17,11 @@ gh auth status >/dev/null
 OWNER="${REPO%%/*}"
 NAME="${REPO#*/}"
 
-# Keep the merge gate minimal: only the fast CI context is required.
-# Android packaging remains outside the merge gate.
+# Keep only the fast CI check in the merge gate. Heavy Android packaging is
+# intentionally outside this ruleset.
 RULESET_JSON=$(cat <<'JSON'
 {
-  "name": "MULTI_Bet main — Merge Queue",
+  "name": "MULTI_Bet main — Pull Request CI",
   "target": "branch",
   "enforcement": "active",
   "bypass_actors": [],
@@ -52,16 +54,7 @@ RULESET_JSON=$(cat <<'JSON'
       }
     },
     {
-      "type": "merge_queue",
-      "parameters": {
-        "check_response_timeout_minutes": 30,
-        "grouping_strategy": "ALLGREEN",
-        "max_entries_to_build": 5,
-        "max_entries_to_merge": 1,
-        "merge_method": "SQUASH",
-        "min_entries_to_merge": 1,
-        "min_entries_to_merge_wait_minutes": 1
-      }
+      "type": "non_fast_forward"
     }
   ]
 }
@@ -79,22 +72,20 @@ request_ruleset() {
   local endpoint="$2"
   local response_file
   response_file="$(mktemp)"
-  trap 'rm -f "${response_file}"' RETURN
 
-  if printf '%s\n' "${RULESET_JSON}" | gh api \
+  if ! printf '%s\n' "${RULESET_JSON}" | gh api \
       --method "${method}" \
       -H "Accept: application/vnd.github+json" \
       -H "X-GitHub-Api-Version: ${API_VERSION}" \
       "${endpoint}" \
       --input - >"${response_file}"; then
-    cat "${response_file}" >/dev/null
-    return 0
+    echo "GitHub rejected the ruleset request:" >&2
+    cat "${response_file}" >&2
+    rm -f "${response_file}"
+    return 1
   fi
 
-  echo "GitHub rejected the ruleset request." >&2
-  echo "HTTP/API response:" >&2
-  cat "${response_file}" >&2 || true
-  return 1
+  rm -f "${response_file}"
 }
 
 if [[ -n "${EXISTING_ID}" ]]; then
@@ -102,18 +93,20 @@ if [[ -n "${EXISTING_ID}" ]]; then
   echo "Updated ruleset ${EXISTING_ID}."
 else
   request_ruleset POST "/repos/${OWNER}/${NAME}/rulesets"
-  echo "Created merge-queue ruleset."
+  echo "Created pull-request CI ruleset."
 fi
 
-# Auto-merge must be enabled at repository level for PRs to enter the automated path.
-gh api \
-  --method PATCH \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: ${API_VERSION}" \
-  "/repos/${OWNER}/${NAME}" \
-  -f allow_auto_merge=true \
-  >/dev/null
+# Auto-merge is a repository setting, not a ruleset rule. Enable it when the
+# authenticated token has administration permission; otherwise leave the
+# repository unchanged and let the PR UI/gh configure auto-merge manually.
+if gh api --method PATCH \
+    -H "Accept: application/vnd.github+json" \
+    -H "X-GitHub-Api-Version: ${API_VERSION}" \
+    "/repos/${OWNER}/${NAME}" \
+    -f allow_auto_merge=true >/dev/null 2>&1; then
+  echo "Auto-merge enabled for ${OWNER}/${NAME}."
+else
+  echo "Auto-merge could not be enabled with this token; configure it manually in repository settings or on the PR." >&2
+fi
 
-echo "Main is configured to require the fast CI check and use the merge queue."
-echo "Repository auto-merge is enabled."
-echo "Android build remains non-blocking and runs through build-android.yml."
+echo "main requires pull requests and the fast status check; force pushes are blocked."
