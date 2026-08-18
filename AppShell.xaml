@@ -32,4 +32,11 @@
             Route="settings" />
     </FlyoutItem>
 
+    <FlyoutItem Title="Logs">
+        <ShellContent
+            Title="Diagnóstico"
+            ContentTemplate="{DataTemplate pages:LogsPage}"
+            Route="logs" />
+    </FlyoutItem>
+
 </Shell>
