@@ -1,0 +1,45 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui-android --skip-manifest-update
+
+      - name: Restore
+        run: dotnet restore MULTI_Bet_playing_Demo.csproj
+
+      - name: Build Debug
+        run: dotnet build MULTI_Bet_playing_Demo.csproj -c Debug -f net8.0-android --no-restore
+
+      - name: Publish APK (Release)
+        run: |
+          dotnet publish MULTI_Bet_playing_Demo.csproj \
+            -c Release \
+            -f net8.0-android \
+            -p:AndroidPackageFormats=apk \
+            --no-restore || true
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: multibet-apk
+          path: |
+            **/bin/Release/**/*.apk
+            **/bin/Debug/**/*.apk
+          if-no-files-found: warn

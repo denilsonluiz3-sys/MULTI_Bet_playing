@@ -1,34 +1,34 @@
 # MULTI Bet Playing Demo
 
-App Android independente (.NET MAUI) para jogar em **múltiplos cassinos online** ao mesmo tempo.
+App Android independente (.NET MAUI) que abre **links de sites de terceiros** em m\u00faltiplos WebViews (2 ou 4 telas).
 
-> Projeto separado do AURA — reutiliza padrões MAUI/Shell, mas é um app próprio.
+> **N\u00e3o somos casa de apostas.** N\u00e3o processamos jogos, odds nem pagamentos.  
+> Proibido para menores de 18 anos. Verifique a legalidade na sua regi\u00e3o.  
+> Jogue com responsabilidade.
 
 ## Funcionalidades
 
-| Aba | Função |
+| Aba | Fun\u00e7\u00e3o |
 |-----|--------|
-| 🏠 **Início** | Cards de cassinos (adicionar, favoritar, editar, remover, filtrar) |
-| 🧪 **Demo** | 4 WebViews em grid 2×2 |
-| 🎮 **Play** | 2 WebViews empilhados + tela cheia |
-| ⚙️ **Config** | Temas Dark / Light / Casino |
+| **In\u00edcio** | Lista de links (voc\u00ea adiciona); favoritos; valida\u00e7\u00e3o de URL |
+| **Demo** | At\u00e9 4 WebViews (2\u00d72) |
+| **Play** | 2 WebViews + tela cheia |
+| **Config** | Temas, limpar cookies, import/export JSON, aviso legal |
 
-## Stack
+## Seguran\u00e7a e compliance (v1.1)
 
-- .NET MAUI (`net8.0-android`)
-- Shell (TabBar + Flyout)
-- WebView
-- Persistência local JSON (`cards.json`)
-- Temas via ResourceDictionary
+- Age gate + aceite de termos no primeiro uso  
+- Valida\u00e7\u00e3o de URL (s\u00f3 http/https; bloqueio de schemes perigosos)  
+- `allowBackup=false`, cleartext desabilitado, network security config  
+- Handler WebView: sem file access  
+- Limpar cookies/cache nas Configura\u00e7\u00f5es  
+- Rodap\u00e9 e textos legais  
+- Sem lista pr\u00e9-carregada de casas  
 
-## Como rodar
+## CI
 
-```bash
-dotnet workload install maui-android
-cd MULTI_Bet_playing_Demo
-dotnet restore
-dotnet build -f net8.0-android
-dotnet build -t:Run -f net8.0-android
-```
+Workflow: `.github/workflows/build-android.yml`
 
-v1.0.0 — App independente 🎰
+---
+
+v1.1.0
