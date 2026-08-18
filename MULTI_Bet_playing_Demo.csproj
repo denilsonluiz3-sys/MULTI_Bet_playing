@@ -17,7 +17,6 @@
     <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
     <AndroidPackageFormats>apk</AndroidPackageFormats>
 
-    <!-- Backend (src) and test sources live in separate projects and must not be compiled into the MAUI app; exclude them from default globbing. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);src/**;tests/**</DefaultItemExcludes>
   </PropertyGroup>
 
@@ -26,11 +25,9 @@
     <AndroidLinkTool>r8</AndroidLinkTool>
     <AndroidCreateProguardMappingFile>true</AndroidCreateProguardMappingFile>
     <AndroidProguardMappingFile>$(OutputPath)mapping.txt</AndroidProguardMappingFile>
-
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
-
     <RunAOTCompilation>false</RunAOTCompilation>
   </PropertyGroup>
 
@@ -47,6 +44,10 @@
 
   <ItemGroup>
     <ProguardConfiguration Include="Platforms\Android\proguard.cfg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="MauiProgram.cs" />
   </ItemGroup>
 
   <ItemGroup>
