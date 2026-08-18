@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace MULTI_Bet_playing_Demo.Services;
 
 public static class UrlValidator
@@ -22,7 +24,7 @@ public static class UrlValidator
         var schemePart = raw.Split(':', 2)[0];
         if (BlockedSchemes.Contains(schemePart))
         {
-            error = "Scheme de URL n\u00e3o permitido.";
+            error = "Scheme de URL não permitido.";
             return false;
         }
 
@@ -31,7 +33,7 @@ public static class UrlValidator
 
         if (!Uri.TryCreate(raw, UriKind.Absolute, out var uri))
         {
-            error = "URL inv\u00e1lida.";
+            error = "URL inválida.";
             return false;
         }
 
@@ -43,18 +45,13 @@ public static class UrlValidator
 
         if (string.IsNullOrWhiteSpace(uri.Host) || uri.Host.Contains(' '))
         {
-            error = "Host inv\u00e1lido.";
+            error = "Host inválido.";
             return false;
         }
 
-        if (uri.IsLoopback ||
-            uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
-            uri.Host.StartsWith("127.", StringComparison.Ordinal) ||
-            uri.Host.StartsWith("169.254.", StringComparison.Ordinal) ||
-            uri.Host.StartsWith("10.", StringComparison.Ordinal) ||
-            uri.Host.StartsWith("192.168.", StringComparison.Ordinal))
+        if (IsLocalOrPrivateHost(uri))
         {
-            error = "Endere\u00e7os locais n\u00e3o s\u00e3o permitidos.";
+            error = "Endereços locais ou privados não são permitidos.";
             return false;
         }
 
@@ -64,4 +61,41 @@ public static class UrlValidator
 
     public static bool IsHttpsPreferred(string url) =>
         Uri.TryCreate(url, UriKind.Absolute, out var u) && u.Scheme == "https";
+
+    private static bool IsLocalOrPrivateHost(Uri uri)
+    {
+        if (uri.IsLoopback)
+            return true;
+
+        if (!IPAddress.TryParse(uri.Host, out var address))
+            return uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase);
+
+        if (IPAddress.IsLoopback(address) || address.Equals(IPAddress.Any) || address.Equals(IPAddress.IPv6Any))
+            return true;
+
+        if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        {
+            var bytes = address.GetAddressBytes();
+            var first = bytes[0];
+            var second = bytes[1];
+
+            return first == 10 ||
+                   (first == 172 && second is >= 16 and <= 31) ||
+                   (first == 192 && second == 168) ||
+                   (first == 169 && second == 254) ||
+                   first == 127 ||
+                   first == 0 ||
+                   first >= 224;
+        }
+
+        if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+        {
+            return address.IsIPv6LinkLocal ||
+                   address.IsIPv6SiteLocal ||
+                   address.IsIPv6Multicast ||
+                   address.IsIPv6UniqueLocal;
+        }
+
+        return false;
+    }
 }
