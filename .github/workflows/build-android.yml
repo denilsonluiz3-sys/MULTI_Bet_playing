@@ -18,12 +18,30 @@ jobs:
     name: build-release-apk
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      MAUI_PROJECT: MULTI_Bet_playing_Demo.csproj
+      ANDROID_FRAMEWORK: net10.0-android
+      ANDROID_RUNTIME: android-arm64
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Verify MAUI project
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$MAUI_PROJECT"
+          grep -q '<UseMaui>true</UseMaui>' "$MAUI_PROJECT"
+          grep -q "<TargetFramework>$ANDROID_FRAMEWORK</TargetFramework>" "$MAUI_PROJECT"
+          test -d Platforms/Android
+          test -d Resources
+          test -f App.xaml
+          echo "MAUI project: $MAUI_PROJECT"
+          echo "Target framework: $ANDROID_FRAMEWORK"
+          echo "Runtime: $ANDROID_RUNTIME"
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
           cache: true
@@ -34,15 +52,16 @@ jobs:
 
       - name: Restore Android Release
         run: |
-          dotnet restore MULTI_Bet_playing_Demo.csproj \
-            -p:RuntimeIdentifier=android-arm64
+          dotnet restore "$MAUI_PROJECT" \
+            --framework "$ANDROID_FRAMEWORK" \
+            --runtime "$ANDROID_RUNTIME"
 
       - name: Publish APK
         run: |
-          dotnet publish MULTI_Bet_playing_Demo.csproj \
+          dotnet publish "$MAUI_PROJECT" \
             --configuration Release \
-            --framework net10.0-android \
-            --runtime android-arm64 \
+            --framework "$ANDROID_FRAMEWORK" \
+            --runtime "$ANDROID_RUNTIME" \
             --no-restore \
             -p:AndroidPackageFormats=apk
 
