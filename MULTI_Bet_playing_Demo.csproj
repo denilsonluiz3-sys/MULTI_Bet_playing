@@ -47,10 +47,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="MauiProgram.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.90" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
   </ItemGroup>
