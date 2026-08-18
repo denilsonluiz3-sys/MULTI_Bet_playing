@@ -15,20 +15,16 @@ public sealed class MultiBetFileLogger : IMultiBetLogger
         _directory = Path.Combine(FileSystem.AppDataDirectory, "logs");
         Directory.CreateDirectory(_directory);
 
-        _sessionId = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+        _sessionId = Guid.NewGuid().ToString("N");
         _logPath = Path.Combine(_directory, $"multibet-{DateTime.UtcNow:yyyyMMdd}.log.jsonl");
 
-        Info($"Log session started: {_sessionId}", "Logging");
+        Info("Log session started", "Logging");
     }
 
     public void Debug(string message, string? source = null) => Write("DEBUG", message, source);
     public void Info(string message, string? source = null) => Write("INFO", message, source);
     public void Warning(string message, string? source = null) => Write("WARN", message, source);
-
-    public void Error(string message, Exception? exception = null, string? source = null)
-    {
-        Write("ERROR", message, source, exception);
-    }
+    public void Error(string message, Exception? exception = null, string? source = null) => Write("ERROR", message, source, exception);
 
     public string GetLogFilePath() => _logPath;
 
@@ -50,7 +46,9 @@ public sealed class MultiBetFileLogger : IMultiBetLogger
             while (!reader.EndOfStream)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                builder.AppendLine(await reader.ReadLineAsync(cancellationToken));
+                var line = await reader.ReadLineAsync(cancellationToken);
+                if (line is not null)
+                    builder.AppendLine(line);
             }
         }
 
@@ -61,18 +59,22 @@ public sealed class MultiBetFileLogger : IMultiBetLogger
 
     private void Write(string level, string message, string? source, Exception? exception = null)
     {
+        var safeMessage = MultiBetLogSanitizer.Sanitize(message);
+        var safeSource = MultiBetLogSanitizer.Sanitize(source);
+        var safeException = exception == null ? null : new
+        {
+            type = exception.GetType().FullName,
+            message = MultiBetLogSanitizer.Sanitize(exception.Message),
+            stackTrace = MultiBetLogSanitizer.Sanitize(exception.StackTrace)
+        };
+
         var entry = new
         {
             timestampUtc = DateTime.UtcNow,
             level,
-            source,
-            message,
-            exception = exception == null ? null : new
-            {
-                type = exception.GetType().FullName,
-                message = exception.Message,
-                stackTrace = exception.StackTrace
-            },
+            source = safeSource,
+            message = safeMessage,
+            exception = safeException,
             sessionId = _sessionId
         };
 
@@ -87,7 +89,7 @@ public sealed class MultiBetFileLogger : IMultiBetLogger
         }
         catch
         {
-            // Logging must never crash the application.
+            // Diagnostic logging must never crash the application.
         }
     }
 
