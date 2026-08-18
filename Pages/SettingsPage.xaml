@@ -5,41 +5,91 @@
              Title="Configurações"
              BackgroundColor="{DynamicResource Background}">
 
-    <VerticalStackLayout Padding="20" Spacing="16">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="14">
 
-        <Label Text="Tema do App"
-               FontSize="18"
-               FontAttributes="Bold"
-               TextColor="{DynamicResource TextPrimary}" />
+            <Label Text="Tema"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{DynamicResource TextPrimary}" />
 
-        <RadioButton x:Name="DarkRadio"
-                     Content="🌙 Dark"
-                     GroupName="Theme"
-                     TextColor="{DynamicResource TextPrimary}"
-                     CheckedChanged="OnThemeChanged" />
+            <RadioButton x:Name="DarkRadio"
+                         Content="🌙 Dark"
+                         GroupName="Theme"
+                         TextColor="{DynamicResource TextPrimary}"
+                         CheckedChanged="OnThemeChanged" />
+            <RadioButton x:Name="LightRadio"
+                         Content="☀️ Light"
+                         GroupName="Theme"
+                         TextColor="{DynamicResource TextPrimary}"
+                         CheckedChanged="OnThemeChanged" />
+            <RadioButton x:Name="CasinoRadio"
+                         Content="🎰 Casino (Dourado/Roxo)"
+                         GroupName="Theme"
+                         TextColor="{DynamicResource TextPrimary}"
+                         CheckedChanged="OnThemeChanged" />
 
-        <RadioButton x:Name="LightRadio"
-                     Content="☀️ Light"
-                     GroupName="Theme"
-                     TextColor="{DynamicResource TextPrimary}"
-                     CheckedChanged="OnThemeChanged" />
+            <BoxView HeightRequest="1" Color="{DynamicResource Border}" Margin="0,8" />
 
-        <RadioButton x:Name="CasinoRadio"
-                     Content="🎰 Casino (Dourado/Roxo)"
-                     GroupName="Theme"
-                     TextColor="{DynamicResource TextPrimary}"
-                     CheckedChanged="OnThemeChanged" />
+            <Label Text="Privacidade e dados"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{DynamicResource TextPrimary}" />
 
-        <BoxView HeightRequest="1" Color="{DynamicResource Border}" Margin="0,12" />
+            <Button Text="Limpar cookies e cache dos WebViews"
+                    Clicked="OnClearWebData"
+                    BackgroundColor="{DynamicResource Surface}"
+                    TextColor="{DynamicResource TextPrimary}"
+                    BorderColor="{DynamicResource Border}"
+                    BorderWidth="1" />
 
-        <Label Text="MULTI Bet Playing Demo"
-               FontSize="12"
-               TextColor="{DynamicResource TextSecondary}"
-               HorizontalOptions="Center" />
-        <Label Text="v1.0.0 – App independente"
-               FontSize="11"
-               TextColor="{DynamicResource TextSecondary}"
-               HorizontalOptions="Center" />
+            <Label Text="Remove cookies/armazenamento web. Não apaga sua lista de links."
+                   FontSize="11"
+                   TextColor="{DynamicResource TextSecondary}" />
 
-    </VerticalStackLayout>
+            <Button Text="Exportar lista de links (JSON)"
+                    Clicked="OnExport"
+                    BackgroundColor="{DynamicResource Surface}"
+                    TextColor="{DynamicResource TextPrimary}"
+                    BorderColor="{DynamicResource Border}"
+                    BorderWidth="1" />
+
+            <Button Text="Importar lista de links (JSON)"
+                    Clicked="OnImport"
+                    BackgroundColor="{DynamicResource Surface}"
+                    TextColor="{DynamicResource TextPrimary}"
+                    BorderColor="{DynamicResource Border}"
+                    BorderWidth="1" />
+
+            <BoxView HeightRequest="1" Color="{DynamicResource Border}" Margin="0,8" />
+
+            <Label Text="Aviso legal"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{DynamicResource TextPrimary}" />
+
+            <Label x:Name="LegalLabel"
+                   FontSize="12"
+                   TextColor="{DynamicResource TextSecondary}"
+                   LineBreakMode="WordWrap" />
+
+            <Button Text="Ver termos novamente / redefinir aceite"
+                    Clicked="OnResetCompliance"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Accent}"
+                    FontSize="13" />
+
+            <BoxView HeightRequest="1" Color="{DynamicResource Border}" Margin="0,8" />
+
+            <Label Text="MULTI Bet Playing Demo · v1.4.0"
+                   FontSize="12"
+                   TextColor="{DynamicResource TextSecondary}"
+                   HorizontalOptions="Center" />
+            <Label Text="App independente · não afiliado a casas de jogo"
+                   FontSize="11"
+                   TextColor="{DynamicResource TextSecondary}"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,24" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
