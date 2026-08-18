@@ -17,7 +17,10 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        builder.Services.AddSingleton<IMultiBetLogger, MultiBetFileLogger>();
+        if (MultiBetLoggingOptions.Enabled)
+            builder.Services.AddSingleton<IMultiBetLogger, MultiBetFileLogger>();
+        else
+            builder.Services.AddSingleton<IMultiBetLogger, NullMultiBetLogger>();
 
 #if DEBUG
         builder.Logging.AddDebug();
