@@ -3,6 +3,7 @@ name: Android
 env:
   DOTNET_VERSION: '10.0.x'
   ANDROID_FRAMEWORK: 'net10.0-android'
+  ANDROID_RUNTIME: 'android-arm64'
 
 on:
   push:
@@ -25,14 +26,56 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
           cache: true
           cache-dependency-path: MULTI_Bet_playing_Demo.csproj
+
       - name: Install MAUI Android workload
         run: dotnet workload install maui-android --skip-manifest-update
-      - name: Restore
-        run: dotnet restore MULTI_Bet_playing_Demo.csproj
+
+      - name: Verify Android RID
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${ANDROID_RUNTIME}" = "android-arm64"
+          echo "Android framework: ${ANDROID_FRAMEWORK}"
+          echo "Android runtime: ${ANDROID_RUNTIME}"
+
+      - name: Restore Android
+        run: |
+          dotnet restore MULTI_Bet_playing_Demo.csproj \
+            --runtime "${ANDROID_RUNTIME}" \
+            -p:RuntimeIdentifier="${ANDROID_RUNTIME}" \
+            -p:RuntimeIdentifiers="${ANDROID_RUNTIME}"
+
       - name: Build Android
-        run: dotnet build MULTI_Bet_playing_Demo.csproj --configuration Release --framework ${{ env.ANDROID_FRAMEWORK }} --no-restore
+        run: |
+          dotnet build MULTI_Bet_playing_Demo.csproj \
+            --configuration Release \
+            --framework "${ANDROID_FRAMEWORK}" \
+            --runtime "${ANDROID_RUNTIME}" \
+            --no-restore \
+            -p:RuntimeIdentifier="${ANDROID_RUNTIME}" \
+            -p:RuntimeIdentifiers="${ANDROID_RUNTIME}"
+
+      - name: Publish APK
+        run: |
+          dotnet publish MULTI_Bet_playing_Demo.csproj \
+            --configuration Release \
+            --framework "${ANDROID_FRAMEWORK}" \
+            --runtime "${ANDROID_RUNTIME}" \
+            --no-restore \
+            -p:RuntimeIdentifier="${ANDROID_RUNTIME}" \
+            -p:RuntimeIdentifiers="${ANDROID_RUNTIME}" \
+            -p:AndroidPackageFormats=apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: multibet-apk-${{ github.sha }}
+          path: '**/bin/Release/**/*.apk'
+          if-no-files-found: error
+          retention-days: 14
