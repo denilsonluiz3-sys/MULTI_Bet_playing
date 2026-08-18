@@ -1,5 +1,8 @@
 name: Project Validation
 
+env:
+  CI_SCHEMA_VERSION: '2'
+
 on:
   pull_request:
   push:
