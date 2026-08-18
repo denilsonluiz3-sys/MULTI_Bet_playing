@@ -17,7 +17,6 @@ public static class FilterState
         {
             var v = value is Favorites or Recents ? value : All;
             Preferences.Set(Key, v);
-            AppLog.Info($"FilterState → {v}");
             Changed?.Invoke(null, EventArgs.Empty);
         }
     }
