@@ -1,0 +1,11 @@
+<Project>
+  <!-- Backend/API projects live under src/ and are built independently.
+       The MAUI application is the repository-root project and must not compile
+       backend controllers or implementation sources as application sources. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'MULTI_Bet_playing_Demo'">
+    <Compile Remove="src/**" />
+    <EmbeddedResource Remove="src/**" />
+    <MauiXaml Remove="src/**" />
+    <None Remove="src/**" />
+  </ItemGroup>
+</Project>
