@@ -1,0 +1,46 @@
+name: Auto-update open PR branches
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-update-prs
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: update-open-pr-branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update open PR branches with main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --paginate \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "/repos/${REPO}/pulls?state=open&base=main&per_page=100" \
+            --jq '.[] | [.number, .head.ref, .head.repo.full_name] | @tsv' |
+          while IFS=$'\t' read -r number branch head_repo; do
+            [ -n "${number:-}" ] || continue
+            [ "${head_repo}" = "${REPO}" ] || continue
+
+            echo "Updating PR #${number} (${branch})"
+            if gh api --method PUT \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2026-03-10' \
+              "/repos/${REPO}/pulls/${number}/update-branch" \
+              -f update_method=rebase >/dev/null; then
+              echo "PR #${number}: updated"
+            else
+              echo "PR #${number}: update unavailable/conflicting; leaving it untouched"
+            fi
+          done
