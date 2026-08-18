@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="MULTI_Bet_playing_Demo.Resources.Themes.DarkTheme">
+
+    <Color x:Key="Primary">#BB86FC</Color>
+    <Color x:Key="PrimaryDark">#3700B3</Color>
+    <Color x:Key="Secondary">#03DAC6</Color>
+    <Color x:Key="Background">#121212</Color>
+    <Color x:Key="Surface">#1E1E1E</Color>
+    <Color x:Key="CardBackground">#2C2C2C</Color>
+    <Color x:Key="TextPrimary">#FFFFFF</Color>
+    <Color x:Key="TextSecondary">#B0B0B0</Color>
+    <Color x:Key="Accent">#CF6679</Color>
+    <Color x:Key="Border">#3A3A3A</Color>
+
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}" />
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource Background}" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource Surface}" />
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}" />
+
+</ResourceDictionary>

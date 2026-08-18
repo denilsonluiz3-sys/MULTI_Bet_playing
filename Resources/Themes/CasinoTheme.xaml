@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="MULTI_Bet_playing_Demo.Resources.Themes.CasinoTheme">
+
+    <Color x:Key="Primary">#FFD700</Color>
+    <Color x:Key="PrimaryDark">#B8860B</Color>
+    <Color x:Key="Secondary">#9B30FF</Color>
+    <Color x:Key="Background">#0D0D0D</Color>
+    <Color x:Key="Surface">#1A0A2E</Color>
+    <Color x:Key="CardBackground">#2D1B4E</Color>
+    <Color x:Key="TextPrimary">#FFD700</Color>
+    <Color x:Key="TextSecondary">#E0B0FF</Color>
+    <Color x:Key="Accent">#FF1493</Color>
+    <Color x:Key="Border">#4A2C7A</Color>
+
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}" />
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource Background}" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource Surface}" />
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}" />
+
+</ResourceDictionary>
