@@ -32,20 +32,24 @@ public partial class PlayPage : ContentPage
         base.OnAppearing();
         WebViewTop.IsVisible = true;
         WebViewBottom.IsVisible = true;
+        AppLog.Info("PlayPage.OnAppearing (2 vertical)");
     }
 
     private async void OnLoadFavorites(object? sender, EventArgs e)
     {
         var favorites = await _cardService.GetFavoritesAsync();
+        AppLog.Info($"Play: favoritos={favorites.Count}");
         if (favorites.Count == 0)
         {
-            await DisplayAlert("Aviso", "Nenhum favorito. Adicione links na aba Inicio.", "OK");
+            await DisplayAlertAsync("Aviso",
+                "Nenhum favorito. Na Início toque ⭐ no card, ou menu ☰ → Favoritos.",
+                "OK");
             return;
         }
 
         if (!UrlValidator.TryNormalize(favorites[0].Url, out var url0, out var err0))
         {
-            await DisplayAlert("URL invalida", err0, "OK");
+            await DisplayAlertAsync("URL inválida", err0, "OK");
             return;
         }
 
@@ -65,8 +69,8 @@ public partial class PlayPage : ContentPage
     {
         WebViewTop.Source = null;
         WebViewBottom.Source = null;
-        LabelTop.Text = "Tela Superior";
-        LabelBottom.Text = "Tela Inferior";
+        LabelTop.Text = "Superior";
+        LabelBottom.Text = "Inferior";
         ResetFullScreen();
     }
 
@@ -107,6 +111,6 @@ public partial class PlayPage : ContentPage
         Grid.SetRowSpan(BorderBottom, 1);
         _isTopFullScreen = false;
         _isBottomFullScreen = false;
-        ToggleFullBtn.Text = "Tela Cheia";
+        ToggleFullBtn.Text = "Tela cheia";
     }
 }

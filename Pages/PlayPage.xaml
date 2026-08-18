@@ -2,83 +2,48 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MULTI_Bet_playing_Demo.Pages.PlayPage"
-             Title="Play 2x"
+             Title="Play (2 vertical)"
              BackgroundColor="{DynamicResource Background}">
 
-    <Grid RowDefinitions="Auto,*,*" Padding="4">
+    <Grid RowDefinitions="Auto,*,*" Padding="4" RowSpacing="4">
 
-        <HorizontalStackLayout Spacing="8" Margin="4">
-            <Button Text="Carregar Favoritos"
-                    Clicked="OnLoadFavorites"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="White"
-                    FontSize="12"
-                    HeightRequest="36"
-                    Padding="12,0" />
-            <Button x:Name="ToggleFullBtn"
-                    Text="Tela Cheia ↑"
-                    Clicked="OnToggleFullScreen"
-                    BackgroundColor="{DynamicResource Secondary}"
-                    TextColor="Black"
-                    FontSize="12"
-                    HeightRequest="36"
-                    Padding="12,0" />
-            <Button Text="Limpar"
-                    Clicked="OnClearAll"
-                    BackgroundColor="{DynamicResource Accent}"
-                    TextColor="White"
-                    FontSize="12"
-                    HeightRequest="36"
-                    Padding="12,0" />
-        </HorizontalStackLayout>
+        <ScrollView Orientation="Horizontal" HeightRequest="44">
+            <HorizontalStackLayout Spacing="8" Padding="4,0">
+                <Button Text="Carregar Favoritos" Clicked="OnLoadFavorites"
+                        BackgroundColor="{DynamicResource Primary}" TextColor="White"
+                        FontSize="12" HeightRequest="36" Padding="12,0" />
+                <Button x:Name="ToggleFullBtn" Text="Tela cheia" Clicked="OnToggleFullScreen"
+                        BackgroundColor="{DynamicResource Secondary}" TextColor="Black"
+                        FontSize="12" HeightRequest="36" Padding="12,0" />
+                <Button Text="Limpar" Clicked="OnClearAll"
+                        BackgroundColor="{DynamicResource Accent}" TextColor="White"
+                        FontSize="12" HeightRequest="36" Padding="12,0" />
+            </HorizontalStackLayout>
+        </ScrollView>
 
-        <Border x:Name="BorderTop"
-                Grid.Row="1"
-                Stroke="{DynamicResource Border}"
-                StrokeThickness="1"
-                StrokeShape="RoundRectangle 8"
-                BackgroundColor="{DynamicResource Surface}"
-                Margin="4">
+        <Border x:Name="BorderTop" Grid.Row="1" Stroke="{DynamicResource Border}" StrokeThickness="1"
+                StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
             <Grid RowDefinitions="Auto,*">
-                <Grid ColumnDefinitions="*,Auto" Margin="6,4">
-                    <Label x:Name="LabelTop" Text="Tela Superior" FontSize="12"
-                           TextColor="{DynamicResource TextSecondary}"
-                           VerticalOptions="Center" />
-                    <Button Text="⛶"
-                            Clicked="OnExpandTop"
-                            BackgroundColor="Transparent"
-                            TextColor="{DynamicResource TextPrimary}"
-                            FontSize="16"
-                            WidthRequest="36"
-                            HeightRequest="28"
-                            Padding="0"
-                            Grid.Column="1" />
+                <Grid ColumnDefinitions="*,Auto" Margin="6,2">
+                    <Label x:Name="LabelTop" Text="Superior" FontSize="12"
+                           TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
+                    <Button Text="⛶" Clicked="OnExpandTop" BackgroundColor="Transparent"
+                            TextColor="{DynamicResource TextPrimary}" FontSize="14"
+                            WidthRequest="36" HeightRequest="28" Padding="0" Grid.Column="1" />
                 </Grid>
                 <WebView x:Name="WebViewTop" Grid.Row="1" />
             </Grid>
         </Border>
 
-        <Border x:Name="BorderBottom"
-                Grid.Row="2"
-                Stroke="{DynamicResource Border}"
-                StrokeThickness="1"
-                StrokeShape="RoundRectangle 8"
-                BackgroundColor="{DynamicResource Surface}"
-                Margin="4">
+        <Border x:Name="BorderBottom" Grid.Row="2" Stroke="{DynamicResource Border}" StrokeThickness="1"
+                StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
             <Grid RowDefinitions="Auto,*">
-                <Grid ColumnDefinitions="*,Auto" Margin="6,4">
-                    <Label x:Name="LabelBottom" Text="Tela Inferior" FontSize="12"
-                           TextColor="{DynamicResource TextSecondary}"
-                           VerticalOptions="Center" />
-                    <Button Text="⛶"
-                            Clicked="OnExpandBottom"
-                            BackgroundColor="Transparent"
-                            TextColor="{DynamicResource TextPrimary}"
-                            FontSize="16"
-                            WidthRequest="36"
-                            HeightRequest="28"
-                            Padding="0"
-                            Grid.Column="1" />
+                <Grid ColumnDefinitions="*,Auto" Margin="6,2">
+                    <Label x:Name="LabelBottom" Text="Inferior" FontSize="12"
+                           TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
+                    <Button Text="⛶" Clicked="OnExpandBottom" BackgroundColor="Transparent"
+                            TextColor="{DynamicResource TextPrimary}" FontSize="14"
+                            WidthRequest="36" HeightRequest="28" Padding="0" Grid.Column="1" />
                 </Grid>
                 <WebView x:Name="WebViewBottom" Grid.Row="1" />
             </Grid>
