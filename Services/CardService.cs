@@ -10,7 +10,10 @@ public class CardService
     private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     public CardService()
-        : this(Path.Combine(FileSystem.AppDataDirectory, "cards.json"))
+        : this(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "MULTI_Bet",
+            "cards.json"))
     {
     }
 
