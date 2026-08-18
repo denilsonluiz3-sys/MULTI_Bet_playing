@@ -56,33 +56,58 @@ public partial class PlayPage : ContentPage
         if (left) { _urlL = url; _titleL = card.Title; LabelLeft.Text = card.Title; WebViewLeft.Source = url; }
         else { _urlR = url; _titleR = card.Title; LabelRight.Text = card.Title; WebViewRight.Source = url; }
         await _cardService.MarkUsedAsync(card.Id);
+        try { StatusLabel.Text = $"{_titleL ?? "1"} | {_titleR ?? "2"}"; } catch { }
     }
 
     private void ClearSide(bool left)
     {
-        if (left) { WebViewLeft.Source = null; LabelLeft.Text = "Tela 1"; _urlL = _titleL = null; }
-        else { WebViewRight.Source = null; LabelRight.Text = "Tela 2"; _urlR = _titleR = null; }
+        if (left) { WebViewLeft.Source = null; LabelLeft.Text = "1"; _urlL = _titleL = null; }
+        else { WebViewRight.Source = null; LabelRight.Text = "2"; _urlR = _titleR = null; }
     }
 
     private void OnSwap(object? sender, EventArgs e)
     {
         try {
             (_urlL, _urlR) = (_urlR, _urlL); (_titleL, _titleR) = (_titleR, _titleL);
-            LabelLeft.Text = _titleL ?? "Tela 1"; LabelRight.Text = _titleR ?? "Tela 2";
+            LabelLeft.Text = _titleL ?? "1"; LabelRight.Text = _titleR ?? "2";
             WebViewLeft.Source = _urlL; WebViewRight.Source = _urlR;
+            try { StatusLabel.Text = $"{_titleL ?? "1"} | {_titleR ?? "2"}"; } catch { }
         } catch (Exception ex) { _ = SafeAlert("Erro", ex.Message); }
     }
 
     private async void OnMuteAll(object? sender, EventArgs e)
     {
         try {
-            _muted = !_muted; MuteAllBtn.Text = _muted ? "🔊 Som" : "🔇 Mute";
+            _muted = !_muted; MuteAllBtn.Text = _muted ? "🔊" : "🔇";
             await TryJs(WebViewLeft, _muted ? JsMute : JsUnmute);
             await TryJs(WebViewRight, _muted ? JsMute : JsUnmute);
         } catch { }
     }
 
     private static async Task TryJs(WebView web, string js) { try { if (web.Source != null) await web.EvaluateJavaScriptAsync(js); } catch { } }
+
+    private async void OnFullMenu(object? sender, EventArgs e)
+    {
+        try {
+            var choice = await DisplayActionSheetAsync("Tela cheia", "Cancelar", null, "Só tela 1", "Só tela 2", "As duas (restaurar)");
+            switch (choice) {
+                case "Só tela 1": OnExpandLeft(sender, e); break;
+                case "Só tela 2": OnExpandRight(sender, e); break;
+                case "As duas (restaurar)": OnRestoreBoth(sender, e); break;
+            }
+        } catch { }
+    }
+
+    private async void OnMoreMenu(object? sender, EventArgs e)
+    {
+        try {
+            var choice = await DisplayActionSheetAsync("Mais", "Cancelar", null, "Recarregar", "Limpar telas");
+            switch (choice) {
+                case "Recarregar": OnReloadAll(sender, e); break;
+                case "Limpar telas": OnClearAll(sender, e); break;
+            }
+        } catch { }
+    }
 
     private void OnExpandLeft(object? sender, EventArgs e)
     {
@@ -127,7 +152,11 @@ public partial class PlayPage : ContentPage
 
     private void OnClearAll(object? sender, EventArgs e)
     {
-        try { ClearSide(true); ClearSide(false); OnRestoreBoth(sender, e); _muted = false; MuteAllBtn.Text = "🔇 Mute"; } catch { }
+        try {
+            ClearSide(true); ClearSide(false); OnRestoreBoth(sender, e);
+            _muted = false; MuteAllBtn.Text = "🔇";
+            try { StatusLabel.Text = "Play"; } catch { }
+        } catch { }
     }
 
     private async Task SafeAlert(string title, string msg) { try { await DisplayAlertAsync(title, msg, "OK"); } catch { } }
