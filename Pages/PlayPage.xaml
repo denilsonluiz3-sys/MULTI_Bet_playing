@@ -2,10 +2,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MULTI_Bet_playing_Demo.Pages.PlayPage"
-             Title="Play (2 vertical)"
+             Title="Play (2 telas)"
              BackgroundColor="{DynamicResource Background}">
 
-    <Grid RowDefinitions="Auto,*,*" Padding="4" RowSpacing="4">
+    <Grid RowDefinitions="Auto,*" Padding="4" RowSpacing="4">
 
         <ScrollView Orientation="Horizontal" HeightRequest="44">
             <HorizontalStackLayout Spacing="8" Padding="4,0">
@@ -21,32 +21,35 @@
             </HorizontalStackLayout>
         </ScrollView>
 
-        <Border x:Name="BorderTop" Grid.Row="1" Stroke="{DynamicResource Border}" StrokeThickness="1"
-                StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
-            <Grid RowDefinitions="Auto,*">
-                <Grid ColumnDefinitions="*,Auto" Margin="6,2">
-                    <Label x:Name="LabelTop" Text="Superior" FontSize="12"
-                           TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
-                    <Button Text="⛶" Clicked="OnExpandTop" BackgroundColor="Transparent"
-                            TextColor="{DynamicResource TextPrimary}" FontSize="14"
-                            WidthRequest="36" HeightRequest="28" Padding="0" Grid.Column="1" />
-                </Grid>
-                <WebView x:Name="WebViewTop" Grid.Row="1" />
-            </Grid>
-        </Border>
+        <Grid x:Name="ScreensGrid" Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="4" Margin="2">
 
-        <Border x:Name="BorderBottom" Grid.Row="2" Stroke="{DynamicResource Border}" StrokeThickness="1"
-                StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
-            <Grid RowDefinitions="Auto,*">
-                <Grid ColumnDefinitions="*,Auto" Margin="6,2">
-                    <Label x:Name="LabelBottom" Text="Inferior" FontSize="12"
-                           TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
-                    <Button Text="⛶" Clicked="OnExpandBottom" BackgroundColor="Transparent"
-                            TextColor="{DynamicResource TextPrimary}" FontSize="14"
-                            WidthRequest="36" HeightRequest="28" Padding="0" Grid.Column="1" />
+            <Border x:Name="BorderLeft" Grid.Column="0" Stroke="{DynamicResource Border}" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
+                <Grid RowDefinitions="Auto,*">
+                    <Grid ColumnDefinitions="*,Auto" Margin="6,2">
+                        <Label x:Name="LabelLeft" Text="Tela 1" FontSize="12"
+                               TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
+                        <Button Text="⛶" Clicked="OnExpandLeft" BackgroundColor="Transparent"
+                                TextColor="{DynamicResource TextPrimary}" FontSize="14"
+                                WidthRequest="36" HeightRequest="28" Padding="0" Grid.Column="1" />
+                    </Grid>
+                    <WebView x:Name="WebViewLeft" Grid.Row="1" />
                 </Grid>
-                <WebView x:Name="WebViewBottom" Grid.Row="1" />
-            </Grid>
-        </Border>
+            </Border>
+
+            <Border x:Name="BorderRight" Grid.Column="1" Stroke="{DynamicResource Border}" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Surface}">
+                <Grid RowDefinitions="Auto,*">
+                    <Grid ColumnDefinitions="*,Auto" Margin="6,2">
+                        <Label x:Name="LabelRight" Text="Tela 2" FontSize="12"
+                               TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
+                        <Button Text="⛶" Clicked="OnExpandRight" BackgroundColor="Transparent"
+                                TextColor="{DynamicResource TextPrimary}" FontSize="14"
+                                WidthRequest="36" HeightRequest="28" Padding="0" Grid.Column="1" />
+                    </Grid>
+                    <WebView x:Name="WebViewRight" Grid.Row="1" />
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </ContentPage>

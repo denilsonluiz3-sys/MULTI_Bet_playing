@@ -5,8 +5,8 @@ namespace MULTI_Bet_playing_Demo.Pages;
 public partial class PlayPage : ContentPage
 {
     private readonly CardService _cardService;
-    private bool _isTopFullScreen;
-    private bool _isBottomFullScreen;
+    private bool _isLeftFull;
+    private bool _isRightFull;
 
     public PlayPage() : this(ResolveCardService()) { }
 
@@ -23,16 +23,16 @@ public partial class PlayPage : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        WebViewTop.IsVisible = false;
-        WebViewBottom.IsVisible = false;
+        WebViewLeft.IsVisible = false;
+        WebViewRight.IsVisible = false;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        WebViewTop.IsVisible = true;
-        WebViewBottom.IsVisible = true;
-        AppLog.Info("PlayPage.OnAppearing (2 vertical)");
+        WebViewLeft.IsVisible = true;
+        WebViewRight.IsVisible = true;
+        AppLog.Info("PlayPage.OnAppearing (2 telas lado a lado | 1 | 2 |)");
     }
 
     private async void OnLoadFavorites(object? sender, EventArgs e)
@@ -42,7 +42,7 @@ public partial class PlayPage : ContentPage
         if (favorites.Count == 0)
         {
             await DisplayAlertAsync("Aviso",
-                "Nenhum favorito. Na Início toque ⭐ no card, ou menu ☰ → Favoritos.",
+                "Nenhum favorito. Na Início toque ⭐ Favorito no card.",
                 "OK");
             return;
         }
@@ -53,64 +53,76 @@ public partial class PlayPage : ContentPage
             return;
         }
 
-        WebViewTop.Source = url0;
-        LabelTop.Text = favorites[0].Title;
+        WebViewLeft.Source = url0;
+        LabelLeft.Text = favorites[0].Title;
         await _cardService.MarkUsedAsync(favorites[0].Id);
 
         if (favorites.Count > 1 && UrlValidator.TryNormalize(favorites[1].Url, out var url1, out _))
         {
-            WebViewBottom.Source = url1;
-            LabelBottom.Text = favorites[1].Title;
+            WebViewRight.Source = url1;
+            LabelRight.Text = favorites[1].Title;
             await _cardService.MarkUsedAsync(favorites[1].Id);
         }
     }
 
     private void OnClearAll(object? sender, EventArgs e)
     {
-        WebViewTop.Source = null;
-        WebViewBottom.Source = null;
-        LabelTop.Text = "Superior";
-        LabelBottom.Text = "Inferior";
+        WebViewLeft.Source = null;
+        WebViewRight.Source = null;
+        LabelLeft.Text = "Tela 1";
+        LabelRight.Text = "Tela 2";
         ResetFullScreen();
     }
 
     private void OnToggleFullScreen(object? sender, EventArgs e)
     {
-        if (_isTopFullScreen || _isBottomFullScreen) { ResetFullScreen(); return; }
-        OnExpandTop(sender, e);
+        if (_isLeftFull || _isRightFull)
+        {
+            ResetFullScreen();
+            return;
+        }
+        OnExpandLeft(sender, e);
     }
 
-    private void OnExpandTop(object? sender, EventArgs e)
+    private void OnExpandLeft(object? sender, EventArgs e)
     {
-        if (_isTopFullScreen) { ResetFullScreen(); return; }
-        BorderBottom.IsVisible = false;
-        Grid.SetRowSpan(BorderTop, 2);
-        _isTopFullScreen = true;
-        _isBottomFullScreen = false;
+        if (_isLeftFull)
+        {
+            ResetFullScreen();
+            return;
+        }
+        BorderRight.IsVisible = false;
+        Grid.SetColumnSpan(BorderLeft, 2);
+        _isLeftFull = true;
+        _isRightFull = false;
         ToggleFullBtn.Text = "Restaurar";
     }
 
-    private void OnExpandBottom(object? sender, EventArgs e)
+    private void OnExpandRight(object? sender, EventArgs e)
     {
-        if (_isBottomFullScreen) { ResetFullScreen(); return; }
-        BorderTop.IsVisible = false;
-        Grid.SetRow(BorderBottom, 1);
-        Grid.SetRowSpan(BorderBottom, 2);
-        _isBottomFullScreen = true;
-        _isTopFullScreen = false;
+        if (_isRightFull)
+        {
+            ResetFullScreen();
+            return;
+        }
+        BorderLeft.IsVisible = false;
+        Grid.SetColumn(BorderRight, 0);
+        Grid.SetColumnSpan(BorderRight, 2);
+        _isRightFull = true;
+        _isLeftFull = false;
         ToggleFullBtn.Text = "Restaurar";
     }
 
     private void ResetFullScreen()
     {
-        BorderTop.IsVisible = true;
-        BorderBottom.IsVisible = true;
-        Grid.SetRow(BorderTop, 1);
-        Grid.SetRowSpan(BorderTop, 1);
-        Grid.SetRow(BorderBottom, 2);
-        Grid.SetRowSpan(BorderBottom, 1);
-        _isTopFullScreen = false;
-        _isBottomFullScreen = false;
+        BorderLeft.IsVisible = true;
+        BorderRight.IsVisible = true;
+        Grid.SetColumn(BorderLeft, 0);
+        Grid.SetColumnSpan(BorderLeft, 1);
+        Grid.SetColumn(BorderRight, 1);
+        Grid.SetColumnSpan(BorderRight, 1);
+        _isLeftFull = false;
+        _isRightFull = false;
         ToggleFullBtn.Text = "Tela cheia";
     }
 }
