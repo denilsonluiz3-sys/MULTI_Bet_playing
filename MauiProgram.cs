@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using MULTI_Bet_playing_Demo.Services.Logging;
 
 namespace MULTI_Bet_playing_Demo;
 
@@ -16,10 +17,14 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        builder.Services.AddSingleton<IMultiBetLogger, MultiBetFileLogger>();
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
 
-        return builder.Build();
+        var app = builder.Build();
+        app.Services.GetRequiredService<IMultiBetLogger>().Info("Application container initialized", "Startup");
+        return app;
     }
 }
