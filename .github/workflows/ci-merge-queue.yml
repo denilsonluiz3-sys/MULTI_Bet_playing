@@ -1,8 +1,9 @@
-name: Fast CI / Merge Queue
+name: Fast CI
 
 on:
   pull_request:
     branches: [ main ]
+  # Kept for future compatibility if Merge Queue becomes available for this repository.
   merge_group:
     types: [ checks_requested ]
 
@@ -14,12 +15,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  fast:
-    name: fast
+  fast-validation:
+    name: fast-validation
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout merge-group SHA
+      - name: Checkout tested SHA
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.sha }}
@@ -41,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout merge-group SHA
+      - name: Checkout tested SHA
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.sha }}
