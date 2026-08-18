@@ -10,8 +10,16 @@ public class CardService
     private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     public CardService()
+        : this(Path.Combine(FileSystem.AppDataDirectory, "cards.json"))
     {
-        _filePath = Path.Combine(FileSystem.AppDataDirectory, "cards.json");
+    }
+
+    public CardService(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentException("O caminho do arquivo é obrigatório.", nameof(filePath));
+
+        _filePath = filePath;
     }
 
     public async Task<List<CardItem>> GetCardsAsync()
@@ -34,6 +42,7 @@ public class CardService
 
     public async Task AddCardAsync(CardItem card)
     {
+        ArgumentNullException.ThrowIfNull(card);
         await LoadAsync();
         _cards.Add(card);
         await SaveAsync();
@@ -41,6 +50,7 @@ public class CardService
 
     public async Task UpdateCardAsync(CardItem card)
     {
+        ArgumentNullException.ThrowIfNull(card);
         await LoadAsync();
         var index = _cards.FindIndex(c => c.Id == card.Id);
         if (index >= 0)
@@ -100,6 +110,10 @@ public class CardService
 
     private async Task SaveAsync()
     {
+        var directory = Path.GetDirectoryName(_filePath);
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
+
         var json = JsonSerializer.Serialize(_cards, _jsonOptions);
         await File.WriteAllTextAsync(_filePath, json);
     }
