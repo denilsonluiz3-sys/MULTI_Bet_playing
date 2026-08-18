@@ -12,7 +12,7 @@
                    FontSize="13" TextColor="{DynamicResource TextSecondary}" />
 
             <Entry x:Name="QueryEntry" Placeholder="Nome, CNPJ ou https://dominio..."
-                   Keyboard="Url" ClearButtonVisibility="WhileEditing" />
+                   Keyboard="Text" ClearButtonVisibility="WhileEditing" />
             <Button Text="🔎 Verificar agora" Clicked="OnVerifyClicked" />
 
             <Border x:Name="ResultCard" IsVisible="False" Padding="14"
@@ -34,7 +34,7 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid ColumnDefinitions="Auto,*" Padding="4" ColumnSpacing="8">
-                            <Label Text="{Binding Passed, Converter={StaticResource BoolToIconConverter}}" FontSize="18" />
+                            <Label Text="{Binding Icon}" FontSize="18" />
                             <VerticalStackLayout Grid.Column="1" Spacing="2">
                                 <Label Text="{Binding Name}" FontAttributes="Bold" />
                                 <Label Text="{Binding Detail}" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
