@@ -18,8 +18,14 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Restore solution
-        run: dotnet restore MULTI_Bet.sln
+      - name: Restore backend projects
+        run: |
+          dotnet restore src/MULTI_Bet.Shared/MULTI_Bet.Shared.csproj
+          dotnet restore src/MULTI_Bet.Infrastructure/MULTI_Bet.Infrastructure.csproj
+          dotnet restore src/MULTI_Bet.Api/MULTI_Bet.Api.csproj
 
-      - name: Build solution
-        run: dotnet build MULTI_Bet.sln -c Release --no-restore
+      - name: Build backend projects
+        run: |
+          dotnet build src/MULTI_Bet.Shared/MULTI_Bet.Shared.csproj -c Release --no-restore
+          dotnet build src/MULTI_Bet.Infrastructure/MULTI_Bet.Infrastructure.csproj -c Release --no-restore
+          dotnet build src/MULTI_Bet.Api/MULTI_Bet.Api.csproj -c Release --no-restore
