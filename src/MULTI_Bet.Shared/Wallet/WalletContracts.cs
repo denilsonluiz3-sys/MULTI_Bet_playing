@@ -31,6 +31,8 @@ public sealed record WalletTransactionDto(
 
 public sealed record CreatePixDepositRequest(decimal Amount);
 
+public sealed record ConfirmPixDepositRequest(string PixTxId);
+
 public sealed record CreatePixDepositResponse(
     Guid TransactionId,
     string Status,

@@ -16,6 +16,14 @@ public sealed class WalletRepository(WalletDbContext db) : IWalletRepository
     public Task<WalletTransaction?> GetByPixTxIdAsync(string pixTxId, CancellationToken cancellationToken = default) =>
         db.WalletTransactions.SingleOrDefaultAsync(x => x.PixTxId == pixTxId, cancellationToken);
 
+    public async Task<IReadOnlyList<WalletTransaction>> GetTransactionsAsync(Guid walletId, CancellationToken cancellationToken = default)
+    {
+        var transactions = await db.WalletTransactions
+            .Where(x => x.WalletId == walletId)
+            .ToListAsync(cancellationToken);
+        return transactions.OrderBy(x => x.CreatedAt).ToArray();
+    }
+
     public async Task AddAsync(Wallet wallet, CancellationToken cancellationToken = default) =>
         await db.Wallets.AddAsync(wallet, cancellationToken);
 
