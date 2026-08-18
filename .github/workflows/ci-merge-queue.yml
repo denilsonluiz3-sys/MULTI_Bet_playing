@@ -3,7 +3,6 @@ name: Fast CI
 on:
   pull_request:
     branches: [ main ]
-  # Kept for future compatibility if Merge Queue becomes available for this repository.
   merge_group:
     types: [ checks_requested ]
 
@@ -53,6 +52,9 @@ jobs:
           set -euo pipefail
           test -f MULTI_Bet_playing_Demo.csproj
           test -f Services/UrlValidator.cs
-          test -f Services/TrustSecurityEngine.cs
+          test -f Services/ComplianceService.cs
+          test -f Services/WebViewSecurity.cs
+          test -f Services/CardService.cs
+          test -f tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
           test -f .github/workflows/build-android.yml
           test -f .github/workflows/ci-merge-queue.yml
