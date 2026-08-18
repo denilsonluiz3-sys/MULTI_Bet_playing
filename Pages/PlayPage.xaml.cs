@@ -21,6 +21,18 @@ public partial class PlayPage : ContentPage
     protected override void OnAppearing() { base.OnAppearing(); try { WebViewLeft.IsVisible = true; WebViewRight.IsVisible = true; } catch { } }
     protected override void OnDisappearing() { base.OnDisappearing(); try { WebViewLeft.IsVisible = false; WebViewRight.IsVisible = false; } catch { } }
 
+    protected override bool OnBackButtonPressed()
+    {
+        try
+        {
+            if (WebViewLeft.CanGoBack) { WebViewLeft.GoBack(); return true; }
+            if (WebViewRight.CanGoBack) { WebViewRight.GoBack(); return true; }
+            if (_leftFull || _rightFull) { OnRestoreBoth(null, EventArgs.Empty); return true; }
+        }
+        catch { }
+        return base.OnBackButtonPressed();
+    }
+
     private async void OnLoadFavorites(object? sender, EventArgs e)
     {
         try {

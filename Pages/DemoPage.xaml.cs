@@ -35,6 +35,19 @@ public partial class DemoPage : ContentPage
     protected override void OnAppearing() { base.OnAppearing(); try { foreach (var w in _wvs) w.IsVisible = true; } catch { } }
     protected override void OnDisappearing() { base.OnDisappearing(); try { foreach (var w in _wvs) w.IsVisible = false; } catch { } }
 
+    protected override bool OnBackButtonPressed()
+    {
+        try
+        {
+            foreach (var w in _wvs)
+            {
+                if (w.CanGoBack) { w.GoBack(); return true; }
+            }
+        }
+        catch { }
+        return base.OnBackButtonPressed();
+    }
+
     private async void OnLoadFavorites(object? sender, EventArgs e)
     {
         try {
@@ -85,7 +98,7 @@ public partial class DemoPage : ContentPage
     private async void OnMuteAll(object? sender, EventArgs e)
     {
         try {
-            _muted = !_muted; MuteBtn.Text = _muted ? "🔊 Som" : "🔇 Mute";
+            _muted = !_muted; MuteBtn.Text = _muted ? "🔊" : "🔇";
             var js = _muted ? JsMute : JsUnmute;
             foreach (var w in _wvs) { try { if (w.Source != null) await w.EvaluateJavaScriptAsync(js); } catch { } }
         } catch { }
@@ -104,8 +117,9 @@ public partial class DemoPage : ContentPage
 
     private void OnClearAll(object? sender, EventArgs e)
     {
-        try { for (int i = 0; i < 4; i++) ClearSlot(i); _muted = false; MuteBtn.Text = "🔇 Mute"; } catch { }
+        try { for (int i = 0; i < 4; i++) ClearSlot(i); _muted = false; MuteBtn.Text = "🔇"; } catch { }
     }
 
-    private async Task SafeAlert(string msg) { try { await DisplayAlertAsync("Erro", msg, "OK"); } catch { } }
+    private async Task SafeAlert(string msg) { try { await DisplayAlertAsync("Erro", msg, "OK"); } catch { }
+    }
 }
