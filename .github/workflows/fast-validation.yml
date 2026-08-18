@@ -1,0 +1,33 @@
+name: fast-validation
+
+env:
+  DOTNET_VERSION: '10.0.x'
+
+on:
+  pull_request:
+    branches: [main]
+  merge_group:
+    types: [checks_requested]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fast-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: fast-validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+          cache-dependency-path: tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj
+      - name: Run unit tests
+        run: dotnet test tests/MULTI_Bet_playing_Demo.Tests/MULTI_Bet_playing_Demo.Tests.csproj --configuration Release --verbosity minimal

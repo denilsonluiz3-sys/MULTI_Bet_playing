@@ -36,6 +36,8 @@ public sealed class UrlValidatorTests
     [InlineData("http://169.254.1.1/test")]
     [InlineData("http://[::1]/test")]
     [InlineData("http://[fc00::1]/test")]
+    [InlineData("http://[::ffff:127.0.0.1]/test")]
+    [InlineData("http://[::ffff:10.0.0.1]/test")]
     public void RejectsLocalPrivateAndLinkLocalAddresses(string input)
     {
         Assert.False(UrlValidator.TryNormalize(input, out _, out _));
