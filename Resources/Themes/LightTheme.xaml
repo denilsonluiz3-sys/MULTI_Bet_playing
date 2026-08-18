@@ -4,16 +4,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="MULTI_Bet_playing_Demo.Resources.Themes.LightTheme">
 
-    <Color x:Key="Primary">#6200EE</Color>
-    <Color x:Key="PrimaryDark">#3700B3</Color>
-    <Color x:Key="Secondary">#03DAC6</Color>
-    <Color x:Key="Background">#FAFAFA</Color>
+    <Color x:Key="Primary">#5B21B6</Color>
+    <Color x:Key="PrimaryDark">#4C1D95</Color>
+    <Color x:Key="Secondary">#0D9488</Color>
+    <Color x:Key="Background">#F3F4F6</Color>
     <Color x:Key="Surface">#FFFFFF</Color>
-    <Color x:Key="CardBackground">#F5F5F5</Color>
-    <Color x:Key="TextPrimary">#212121</Color>
-    <Color x:Key="TextSecondary">#757575</Color>
-    <Color x:Key="Accent">#B00020</Color>
-    <Color x:Key="Border">#E0E0E0</Color>
+    <Color x:Key="CardBackground">#FFFFFF</Color>
+    <Color x:Key="TextPrimary">#111827</Color>
+    <Color x:Key="TextSecondary">#374151</Color>
+    <Color x:Key="Accent">#B91C1C</Color>
+    <Color x:Key="Border">#9CA3AF</Color>
 
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}" />
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource Background}" />

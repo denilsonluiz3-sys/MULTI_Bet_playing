@@ -7,6 +7,7 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
+        ThemeManager.ApplySavedTheme();
     }
 
     private async void OnFilterAll(object? sender, EventArgs e)
