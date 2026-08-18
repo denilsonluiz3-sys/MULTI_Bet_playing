@@ -15,8 +15,8 @@ gh auth status >/dev/null
 OWNER="${REPO%%/*}"
 NAME="${REPO#*/}"
 
-# The required check is deliberately only the fast job. Android packaging remains
-# non-blocking for the merge queue and continues to run in build-android.yml.
+# Only the fast CI check is required by the queue. Android packaging stays outside
+# the merge gate and continues through build-android.yml.
 RULESET_JSON=$(cat <<'JSON'
 {
   "name": "MULTI_Bet main — Merge Queue",
@@ -37,7 +37,8 @@ RULESET_JSON=$(cat <<'JSON'
         "dismiss_stale_reviews_on_push": true,
         "require_code_owner_review": false,
         "require_last_push_approval": false,
-        "required_review_thread_resolution": false
+        "required_review_thread_resolution": false,
+        "allowed_merge_methods": ["squash"]
       }
     },
     {
@@ -74,21 +75,22 @@ EXISTING_ID=$(gh api --paginate \
   "/repos/${OWNER}/${NAME}/rulesets?per_page=100" \
   --jq ".[] | select(.name == \"${RULESET_NAME}\") | .id" | head -n1 || true)
 
-if [[ -n "${EXISTING_ID}" ]]; then
+request_ruleset() {
+  local method="$1"
+  local endpoint="$2"
   printf '%s\n' "${RULESET_JSON}" | gh api \
-    --method PUT \
+    --method "${method}" \
     -H "Accept: application/vnd.github+json" \
     -H "X-GitHub-Api-Version: ${API_VERSION}" \
-    "/repos/${OWNER}/${NAME}/rulesets/${EXISTING_ID}" \
+    "${endpoint}" \
     --input - >/dev/null
+}
+
+if [[ -n "${EXISTING_ID}" ]]; then
+  request_ruleset PUT "/repos/${OWNER}/${NAME}/rulesets/${EXISTING_ID}"
   echo "Updated ruleset ${EXISTING_ID}."
 else
-  printf '%s\n' "${RULESET_JSON}" | gh api \
-    --method POST \
-    -H "Accept: application/vnd.github+json" \
-    -H "X-GitHub-Api-Version: ${API_VERSION}" \
-    "/repos/${OWNER}/${NAME}/rulesets" \
-    --input - >/dev/null
+  request_ruleset POST "/repos/${OWNER}/${NAME}/rulesets"
   echo "Created merge-queue ruleset."
 fi
 
