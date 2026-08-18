@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Configures the main branch with repository rules that are supported without
-# GitHub Merge Queue. The repository is owned by a personal account, so this
-# script intentionally does NOT create or reference a merge_queue rule.
+# Configures main with supported repository rules without GitHub Merge Queue.
+# This repository is owned by a personal account, so this script intentionally
+# does NOT create or reference a merge_queue rule.
 # Requires: gh authenticated with repository administration permission.
 # Usage: ./setup-branch-protection.sh [owner/repo]
 
@@ -17,8 +17,6 @@ gh auth status >/dev/null
 OWNER="${REPO%%/*}"
 NAME="${REPO#*/}"
 
-# Keep only the fast CI check in the merge gate. Heavy Android packaging is
-# intentionally outside this ruleset.
 RULESET_JSON=$(cat <<'JSON'
 {
   "name": "MULTI_Bet main — Pull Request CI",
@@ -54,7 +52,7 @@ RULESET_JSON=$(cat <<'JSON'
       }
     },
     {
-      "type": "non_fast_forward"
+      "type": "block_force_pushes"
     }
   ]
 }
@@ -98,7 +96,7 @@ fi
 
 # Auto-merge is a repository setting, not a ruleset rule. Enable it when the
 # authenticated token has administration permission; otherwise leave the
-# repository unchanged and let the PR UI/gh configure auto-merge manually.
+# repository unchanged and let the PR UI/gh configure it manually.
 if gh api --method PATCH \
     -H "Accept: application/vnd.github+json" \
     -H "X-GitHub-Api-Version: ${API_VERSION}" \
