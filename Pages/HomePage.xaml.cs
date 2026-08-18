@@ -39,7 +39,6 @@ public partial class HomePage : ContentPage
     {
         var filter = FilterState.Current;
         FilterLabel.Text = $"Filtro: {filter}";
-        AppLog.Info($"HomePage.Load filter={filter}");
 
         List<CardItem> cards = filter switch
         {
@@ -47,25 +46,81 @@ public partial class HomePage : ContentPage
             FilterState.Recents => await _cardService.GetRecentsAsync(),
             _ => await _cardService.GetCardsAsync()
         };
+
+        var all = await _cardService.GetCardsAsync();
+        var favCount = all.Count(c => c.IsFavorite);
+        AppLog.Info($"HomePage.Load filter={filter} lista={cards.Count} total={all.Count} fav={favCount}");
+
+        CardsCollection.ItemsSource = null;
         CardsCollection.ItemsSource = cards;
     }
 
     private async void OnCardTapped(object? sender, TappedEventArgs e)
     {
-        if (e.Parameter is not CardItem card) return;
+        CardItem? card = e.Parameter as CardItem;
+        if (card == null && sender is Element el)
+            card = el.BindingContext as CardItem;
+        if (card == null) return;
         await OpenCardAsync(card);
     }
 
     private async void OnFavoriteClicked(object? sender, EventArgs e)
     {
         CardItem? card = null;
-        if (sender is Button btn)
+        if (sender is BindableObject bo)
+            card = bo.BindingContext as CardItem;
+        if (card == null && sender is Button btn)
             card = btn.CommandParameter as CardItem;
 
+        if (card == null)
+        {
+            AppLog.Warning("OnFavoriteClicked: card null (BindingContext/CommandParameter)");
+            await DisplayAlertAsync("Favorito", "Não foi possível identificar o card. Tente de novo.", "OK");
+            return;
+        }
+
+        AppLog.Info($"OnFavoriteClicked: {card.Title} id={card.Id} antes={card.IsFavorite}");
+        await _cardService.ToggleFavoriteAsync(card.Id);
+
+        var updated = (await _cardService.GetCardsAsync()).FirstOrDefault(c => c.Id == card.Id);
+        var nowFav = updated?.IsFavorite ?? !card.IsFavorite;
+        await DisplayAlertAsync(
+            nowFav ? "Favorito" : "Removido",
+            nowFav ? $"“{card.Title}” marcado como favorito." : $"“{card.Title}” removido dos favoritos.",
+            "OK");
+
+        await LoadCardsAsync();
+    }
+
+    private async void OnCardSwiped(object? sender, SwipedEventArgs e)
+    {
+        var card = e.Parameter as CardItem
+            ?? (sender as BindableObject)?.BindingContext as CardItem;
         if (card == null) return;
 
-        await _cardService.ToggleFavoriteAsync(card.Id);
-        await LoadCardsAsync();
+        var action = await DisplayActionSheetAsync(
+            card.Title, "Cancelar", null,
+            card.IsFavorite ? "Remover dos Favoritos" : "Adicionar aos Favoritos",
+            "Abrir", "Remover link");
+
+        switch (action)
+        {
+            case "Adicionar aos Favoritos":
+            case "Remover dos Favoritos":
+                await _cardService.ToggleFavoriteAsync(card.Id);
+                await LoadCardsAsync();
+                break;
+            case "Abrir":
+                await OpenCardAsync(card);
+                break;
+            case "Remover link":
+                if (await DisplayAlertAsync("Remover", $"Apagar “{card.Title}”?", "Sim", "Não"))
+                {
+                    await _cardService.RemoveCardAsync(card.Id);
+                    await LoadCardsAsync();
+                }
+                break;
+        }
     }
 
     private async Task OpenCardAsync(CardItem card)
