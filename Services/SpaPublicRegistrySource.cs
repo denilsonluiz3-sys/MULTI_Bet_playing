@@ -66,17 +66,17 @@ public sealed class SpaPublicRegistrySource
 
     private static string CleanHtml(string value)
     {
+        value = Regex.Replace(value, "<(?:br|/a|/li)\\b[^>]*>", "\n", RegexOptions.IgnoreCase);
         var noTags = Regex.Replace(value, "<[^>]+>", " ", RegexOptions.Singleline);
         return WebUtility.HtmlDecode(noTags)
             .Replace('\u00a0', ' ')
-            .Replace("\r", " ")
-            .Replace("\n", " ")
+            .Replace("\r", "")
             .Replace("\t", " ")
             .Trim();
     }
 
     private static IReadOnlyList<string> SplitItems(string value) =>
-        Regex.Split(value, @"\s{2,}|\s*[•·]\s*|\s*;\s*")
+        Regex.Split(value, @"\s*\n\s*|\s{2,}|\s*[•·]\s*|\s*;\s*")
             .Select(x => x.Trim())
             .Where(x => x.Length > 0)
             .Distinct(StringComparer.OrdinalIgnoreCase)
