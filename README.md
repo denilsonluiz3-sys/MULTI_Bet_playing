@@ -29,17 +29,14 @@ App Android independente (.NET MAUI) que abre **links de sites de terceiros** em
 - Resultado explicável: verificado, atenção, não verificado, possível imitação ou fonte indisponível
 - Nenhuma credencial, dado bancário ou pagamento é tratado pelo Trust & Security Engine
 
-## Fluxo de Desenvolvimento Autônomo
-
-O fluxo do repositório é orientado a desenvolvimento contínuo:
+## Fluxo de Desenvolvimento
 
 ```text
 ANALISAR
     ↓
 PESQUISAR E ENTENDER
     ↓
-REAPROVEITAR O AURA quando já existir solução funcional
-ou quando a adaptação for pequena e compatível
+REAPROVEITAR/ADAPTAR O AURA quando houver solução funcional compatível
     ↓
 IMPLEMENTAR
     ↓
@@ -48,26 +45,30 @@ ACTIONS
 GREEN = validado pelo CI
 ```
 
-### CI rápido e Merge Queue
+## CI/CD
 
-- `.github/workflows/ci-merge-queue.yml` executa os testes rápidos em `pull_request` e `merge_group`.
-- O job `fast` é o check destinado a ser obrigatório para a fila.
-- `.github/workflows/build-android.yml` continua responsável pelo build/publicação Android e não é colocado no caminho rápido da fila.
-- `.github/workflows/auto-update-pr.yml` tenta atualizar automaticamente PRs internos quando `main` recebe um novo commit.
-- `.github/workflows/auto-merge-queue.yml` habilita o auto-merge para PRs internos não-draft, colocando-os automaticamente no fluxo de Merge Queue quando os requisitos estiverem satisfeitos.
-- `.github/scripts/setup-branch-protection.sh` configura a proteção/ruleset de `main`, incluindo Merge Queue e somente o check rápido como obrigatório.
+- `.github/workflows/ci-merge-queue.yml`: validação rápida, com `pull_request` e suporte ao evento `merge_group`; o checkout usa `github.event.merge_group.head_sha` quando esse evento ocorrer.
+- O check rápido publicado é `fast-validation`.
+- `.github/workflows/project-validation.yml`: validação mais ampla do projeto, incluindo estrutura, workload MAUI Android, build Android Debug, testes e verificação de segredos.
+- `.github/workflows/build-android.yml`: build e publicação do APK Android.
+- `.github/workflows/auto-update-pr.yml`: atualiza automaticamente PRs internos quando `main` recebe commits.
+- `.github/workflows/auto-merge-queue.yml`: solicita auto-merge para PRs internos elegíveis quando os requisitos do repositório estiverem satisfeitos.
+- `.github/scripts/setup-branch-protection.sh`: configura o ruleset atual da `main` com Pull Request e o check `fast-validation`; também habilita a exclusão automática de branches após merge.
 
-O GitHub Merge Queue executa os checks no SHA temporário do grupo de merge; o workflow usa `github.event.merge_group.head_sha` explicitamente. O build Android pesado permanece paralelo/pós-merge para não transformar o fluxo cotidiano em uma espera desnecessária.
+### Merge Queue
+
+O workflow possui suporte ao evento `merge_group` para compatibilidade com ambientes em que a Merge Queue esteja disponível. A regra `merge_queue` **não está configurada neste repositório**, pois a API rejeitou essa regra para o contexto atual da conta/repositório.
 
 ### Testes
 
-Os testes rápidos ficam em `tests/MULTI_Bet_playing_Demo.Tests/` e atualmente cobrem a superfície de segurança do `UrlValidator`, incluindo schemes perigosos, endereços locais, HTTPS e normalização.
+Os testes ficam em `tests/MULTI_Bet_playing_Demo.Tests/` e atualmente cobrem a superfície de segurança do `UrlValidator`, incluindo schemes perigosos, endereços locais, HTTPS e normalização.
 
 ## CI
 
-- Fast CI / Merge Queue: `.github/workflows/ci-merge-queue.yml`
+- Fast CI: `.github/workflows/ci-merge-queue.yml`
+- Project Validation: `.github/workflows/project-validation.yml`
 - Auto-update de PRs: `.github/workflows/auto-update-pr.yml`
-- Auto-enqueue/auto-merge: `.github/workflows/auto-merge-queue.yml`
+- Auto-merge: `.github/workflows/auto-merge-queue.yml`
 - Build Android: `.github/workflows/build-android.yml`
 
 ---
