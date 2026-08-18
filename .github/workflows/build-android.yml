@@ -55,8 +55,8 @@ jobs:
       - name: Restore Android Release
         run: |
           dotnet restore "$MAUI_PROJECT" \
-            --framework "$ANDROID_FRAMEWORK" \
-            --runtime "$ANDROID_RUNTIME"
+            --runtime "$ANDROID_RUNTIME" \
+            -p:TargetFramework="$ANDROID_FRAMEWORK"
 
       - name: Publish APK
         run: |
